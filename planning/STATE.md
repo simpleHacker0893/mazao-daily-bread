@@ -29,7 +29,7 @@ _Rolling snapshot. Edit in place; never append a log._
 - `origin/main` on GitHub has one "Initial commit" containing a README. Local `main` has no commits yet.
 
 ## Phases
-See `planning/ROADMAP.md`. Phases 0–4 form the R0 pilot. Specs are in `planning/specs/` and are published as GitHub issues.
+See `planning/ROADMAP.md`. Phases 0–4 form the R0 pilot. Specs are in `planning/sprints/phase-NN-*/spec.md` and are published as GitHub issues.
 
 ## Release map
 
