@@ -1,6 +1,6 @@
 # Phase 2 implementation plan (tickets to be created)
 
-Spec: `planning/sprints/phase-02-onboarding-and-notebook/spec.md` (GitHub #3). Execution detail: `planning/sprints/001-r0-pilot/blueprint.md` step **B4**, tasks **2 (onboarding), 3 (notebook) and 5 (`nextRouteAfterPin`)**. The spec header says "B4 tasks 2, 3 and 4"; task 4 is now the Leo report (Phase 4) and routing is task 5, as `planning/ROADMAP.md` already says. **D-049** (English by default, Kiswahili as a switch; on the unmerged `feat/a1a-skeleton` branch) supersedes the spec's bilingual titles, tabs and chip captions.
+Spec: `planning/sprints/phase-02-onboarding-and-notebook/spec.md` (GitHub #3). Execution detail: `planning/sprints/001-r0-pilot/blueprint.md` step **B4**, tasks **2 (onboarding), 3 (notebook) and 5 (`nextRouteAfterPin`)**. The spec header says "B4 tasks 2, 3 and 4"; task 4 is now the Leo report (Phase 4) and routing is task 5, as `planning/ROADMAP.md` already says. **D-049** (English by default, Kiswahili as a switch; merged to `main` with #25) supersedes the spec's bilingual titles, tabs and chip captions.
 Each task = one GitHub ticket = one branch = one PR, squash-merged to `main` when review and CI pass. Phase 0 tickets are #15–#22; Phase 1 and Phase 3 tickets are referred to by their plan task names until issue numbers exist.
 
 B4 is one blueprint step, but its Phase 2 part needs a backend specialist (`domain/`, `local/`) and a frontend specialist (pages, `ui/`) in different files, so it is split. Tasks 2 and 3 are separate frontend tickets because the stepper and the notebook share no files and can run in parallel once Task 1 lands. Task 4 is the step's Verify (the B4 e2e), owned by qa so that Tasks 2 and 3 stay parallel.
@@ -12,18 +12,18 @@ B4 is one blueprint step, but its Phase 2 part needs a backend specialist (`doma
 | Task | Ticket | Step | Lane | Agent | Model | Branch | Blocked by |
 |---|---|---|---|---|---|---|---|
 | 1 | P2-1 | B4.5 + onboarding data | Dev B | backend | **strongest** | `feat/b4-onboarding-data` | Phase 1 Task 4 (B2) to start; Phase 1 Task 5 (A4) to merge (e2e fixture) |
-| 2 | P2-2 | B4.2 | Dev B | frontend | default | `feat/b4-onboarding-stepper` | Task 1, the Phase 3 primitives + pickers ticket, #20 (soft) |
-| 3 | P2-3 | B4.3 | Dev B | frontend | default | `feat/b4-notebook` | Task 1, the Phase 3 primitives + pickers ticket |
+| 2 | P2-2 | B4.2 | Dev B | frontend | default | `feat/b4-onboarding-stepper` | Task 1, P3-2a (the Phase 3 primitives + pickers ticket), #20 (soft) |
+| 3 | P2-3 | B4.3 | Dev B | frontend | default | `feat/b4-notebook` | Task 1, P3-2a (the Phase 3 primitives + pickers ticket) |
 | 4 | P2-4 | B4 Verify | Dev B | qa | default | `feat/b4-onboarding-e2e` | Task 2, Task 3, Phase 1 Task 5 (A4), Phase 3 screens ticket (P3-2: Bidhaa, Deni, new sale), **#20 (hard, AC-31)** |
 
-"The Phase 3 primitives + pickers ticket" is the early-merging Phase 3 ticket that PR #23's revision splits out of P3-2: the `ui/` primitives (`Button`, `Chip`, `ChipGroup`, `MoneyInput`, `QtyInput`, `Sheet`, `IssueList`, `SaveAnywayDialog`) and the `ui/ledger` pickers (`ItemPicker`, `AddItemSheet`, `CustomerPicker`, `DueChips`). Tasks 2 and 3 do **not** wait for the rest of P3-2 (the ledger screens). Only Task 4 waits for P3-2, because its e2e asserts on `/bidhaa` and `/deni` and records one sale.
+"The Phase 3 primitives + pickers ticket" is **P3-2a** in PR #23's revision, the early-merging ticket split out of P3-2: the `ui/` primitives (`Button`, `Chip`, `ChipGroup`, `MoneyInput`, `QtyInput`, `Sheet`, `IssueList`, `SaveAnywayDialog`) and the `ui/ledger` pickers (`ItemPicker`, `AddItemSheet`, `CustomerPicker`, `DueChips`). Tasks 2 and 3 do **not** wait for the rest of P3-2 (the ledger screens). Only Task 4 waits for P3-2, because its e2e asserts on `/bidhaa` and `/deni` and records one sale.
 
 **#20 is a soft blocker for screen tickets** in Phases 1 and 2 (use the background component if merged, otherwise the solid scrim colour). It is a hard blocker only for Task 4, which checks the real onboarding imagery (AC-31).
 
 ## Global Constraints
 
 - Everything in the Phase 0 and Phase 1 plans' Global Constraints applies (pnpm; latest Next.js, no `src/`, React Compiler, no hand memoisation; webpack build; Biome; strict TS; client pages read only Dexie; every string via `t(key, locale)`; tokens; 48 px targets; privacy; test-first for `domain` and `local`).
-- **Language (D-049).** English by default; Kiswahili when the device locale is `sw` (`deviceDb.meta['locale']`, Phase 1 plan Global Constraints and OQ P1-Q13). No bilingual titles, tab labels or chip captions. Every title, tab, chip and helper line is a message key with an `en` and a `sw` value in the **ledger** halves of the dictionary (`en.ledger.ts` / `sw.ledger.ts` on the A1a branch; exact layout follows the A1a i18n contract once merged). To avoid conflicts between parallel Tasks 2 and 3, Task 2 adds keys only under `ledger.onboarding.*` and `ledger.profile.*`, Task 3 only under `ledger.notebook.*`. Market words stay untranslated in both locales (D-005; OQ P1-Q13c). Kiswahili values come from `docs/design/stitch-prompts.md` where they exist (Tuanze, Wasifu wa Biashara, Leta Daftari Lako, Wanaonidai, Ninaowadai, Stoki); everything else uses the English text in the `sw` value and is listed in the PR for the native-speaker check (Q-006, OQ P1-Q14). No language switch is built in Phase 2 (it lives in Settings, P4-4; OQ P2-Q12).
+- **Language (D-049).** English by default; Kiswahili when the device locale is `sw` (`deviceDb.meta['locale']`, Phase 1 plan Global Constraints and OQ P1-Q13). No bilingual titles, tab labels or chip captions. Every title, tab, chip and helper line is a message key with an `en` and a `sw` value in the **ledger** halves of the dictionary (`i18n/en.ledger.ts` / `i18n/sw.ledger.ts`, per the A1a i18n contract on `main`). To avoid conflicts between parallel Tasks 2 and 3, Task 2 adds keys only under `ledger.onboarding.*` and `ledger.profile.*`, Task 3 only under `ledger.notebook.*`. Market words stay untranslated in both locales (D-005 and the revision brief; this differs from D-049's merged interim of plain English in `en`, OQ P1-Q13c). Kiswahili values come from `docs/design/stitch-prompts.md` where they exist (Tuanze, Wasifu wa Biashara, Leta Daftari Lako, Wanaonidai, Ninaowadai, Stoki); everything else uses the English text in the `sw` value and is listed in the PR for the native-speaker check (Q-006, OQ P1-Q14). No language switch is built in Phase 2 (it lives in Settings, P4-4; OQ P2-Q12).
 - **One save path (aligned with PR #23).** Pages write only through `local/save.ts`, which wraps `local/commit.ts` and returns a `SaveOutcome` (`saved` / `hard_error` / `needs_override`). Phase 2 adds `saveOpening`, `saveStockAdjustment` and `saveOnboardingFinish` there (Task 1). Grill issues show through the Phase 3 `IssueList` and `SaveAnywayDialog`. The onboarding **progress draft** is the only exception: it lives in the business database's `onboarding` table, is written only by `local/onboarding-progress.ts`, and never syncs (spec "Onboarding progress store").
 - **Pickers return drafts; saves create parties.** `CustomerPicker` (Phase 3) and `SupplierPicker` (Task 3) never write to Dexie. They return either an existing id or a new party (`{ name, phone? }`), and the save function creates the new party and the record in one Dexie transaction (`DraftOpening.newCustomer` / `newSupplier`, Phase 1 Task 1). This matches PR #23's `saveSale` with a new customer; the exact `CustomerPicker` contract is a proposed edit to PR #23 (see the PR body).
 - **Pure numbers:** the "Brought forward: KES …" totals, the per-item stock already brought forward, and every applicability rule come from `domain` functions; components never add money or quantities.
@@ -159,7 +159,7 @@ Right after setting a PIN, a merchant meets "Let's get started" ("Tuanze" on a p
 ### Blocked by
 
 - Task 1
-- The Phase 3 primitives + pickers ticket (PR #23 revision)
+- P3-2a, the Phase 3 primitives + pickers ticket (PR #23 revision)
 - #20 (soft: background component if merged, otherwise the scrim colour)
 
 ---
@@ -202,7 +202,7 @@ A merchant copies what their paper notebook already holds into Mazao: who owes t
 ### Blocked by
 
 - Task 1
-- The Phase 3 primitives + pickers ticket (PR #23 revision: `CustomerPicker`, `DueChips`, `MoneyInput`, `QtyInput`, `IssueList`, `SaveAnywayDialog`)
+- P3-2a, the Phase 3 primitives + pickers ticket (PR #23 revision: `CustomerPicker`, `DueChips`, `MoneyInput`, `QtyInput`, `IssueList`, `SaveAnywayDialog`)
 
 ---
 
@@ -259,6 +259,6 @@ Plan-local IDs; the main session assigns `Q-0xx` numbers in `planning/QUESTIONS.
 - **P2-Q7 (Task 3):** What does the stock tab show when the merchant has no goods items (a services-only boda rider, or one who skipped)? Interim: an empty state saying stock is only for goods, with a link to Bidhaa to add an item; no inline item creation.
 - **P2-Q8 (Task 2):** Can "Next" be pressed without answering? The review screen's "Not answered" sections imply yes. Interim: yes for every question; Next on an unanswered question moves on without saving a value.
 - **P2-Q9 (Task 2):** After "Set up Mazao" in redo mode (from Settings), should the merchant still go to `/notebook`, or back to Settings? Interim: `/notebook`, same as first run.
-- **P2-Q10 (Task 2, Phase 3 `DueChips`, D-049):** In the English UI, do the due-rule chips keep the Kiswahili words (kesho, Ijumaa, wiki ijayo, mwisho wa mwezi) as market words, or show English (Tomorrow, Friday, Next week, End of month)? Interim: English in `en`, Kiswahili in `sw` (D-049: everything English by default). A dictionary change either way.
+- **P2-Q10 (Task 2, Phase 3 `DueChips`, D-049):** In the English UI, do the due-rule chips keep the Kiswahili words (kesho, Ijumaa, wiki ijayo, mwisho wa mwezi) as market words, or show English (Tomorrow, Friday, Next week, End of month)? Interim: English in `en`, Kiswahili in `sw` (D-049: everything English by default; matches PR #23's P3-2a `DueChips`). A dictionary change either way.
 - **P2-Q11 (Task 3, M12):** On the stock tab, does "Add" add to the quantity already brought forward, or set the opening stock to the number entered (replacing earlier rows)? Interim: add, and each goods row shows "Already brought forward: n unit" so the merchant sees what is there before adding. A wrong row is voided, not edited.
-- **P2-Q12 (Task 2, D-049):** D-049's draft offers the language choice "once during sign-in or onboarding". Should the stepper start with a language question? Interim: no; the switch lives in Settings (P4-4), as in P1-Q13b.
+- **P2-Q12 (Task 2, D-049):** D-049 offers the language choice "once during sign-in or onboarding". Should the stepper start with a language question? Interim: no; the switch lives in Settings (P4-4), as in P1-Q13b.
