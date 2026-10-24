@@ -1,6 +1,24 @@
-# Mazao: Stitch Prompts (v2)
+# Mazao: Stitch Prompts (v3)
 
-Prompts for generating Mazao's landing page and mobile app UI in Stitch. v2 replaces v1. The changes:
+## v3 changes (2026-10-24, D0 / issue #21)
+
+v3 sits on top of v2. Where a v2 prompt below disagrees with this section, **this section wins**.
+
+1. **English by default (owner change, supersedes the bilingual rule for design).** All screen copy is English: titles, bottom-nav labels (Overview, Sales, Debts, Expenses, More), section headings, buttons and body text. Do **not** stack a Kiswahili title over an English one. Wherever a v2 prompt says *"Title 'X' with 'Y' under it"*, render only the English **Y**. Kiswahili is a **user-selectable language**: an "English / Kiswahili" switch on Settings (§3.14, Language section) and shown once in the sign-in/onboarding flow (§3.1). Item names and market units stay as merchants say them (sukuma wiki, mayai, kilo, gunia, fundo, tray, M-Pesa). §11 is now the Kiswahili string table for the switched language. A decision record superseding D-004/D-040's language rule is still to be written in `planning/DECISIONS.md`.
+2. **Imagery addendum (Q-012, D-045).** Photographs only, never illustrations.
+   - Landing (§2.1), sign-in (§3.1), Set PIN (§3.2), Unlock (§3.3) and onboarding (§3.4 to §3.6): **"photographic background under a solid scrim, text on a solid Surface panel."**
+   - Every other R0 screen: **"imagery only in the header band and empty state."**
+   - Paste the matching line after the Core token block in each prompt.
+3. **Mobile and desktop for every screen.** Each screen is generated on MOBILE (360px) and DESKTOP (1280px). App screens on desktop keep the **bottom navigation at every width (D-040): no sidebar, no rail**; use the width for a centred content column (max about 960px) and wider cards or tables. The landing page gets a genuinely desktop-optimised layout.
+4. **Known conflicts, never show:** "Switch account" or "Add another account" (D-039); "Backing up" (the chip says "Saving…", RQ-1); snackbar "Undo" (records are immutable, D-018; use "View"); a tablet/desktop navigation rail (D-040).
+
+Outputs of the D0 run live in [`docs/design/r0/`](r0/README.md).
+
+---
+
+## v2 notes
+
+Prompts for generating Mazao's landing page and mobile app UI in Stitch. v2 replaced v1. The changes:
 - a new landing page;
 - a new palette and font, because v1's warm-paper palette is a known AI-default look;
 - **Kiswahili + English titles everywhere.**
@@ -47,8 +65,10 @@ Prompts for generating Mazao's landing page and mobile app UI in Stitch. v2 repl
 ### Core token block (paste wherever a prompt says [Core token block])
 
 ```
-DESIGN SYSTEM (REQUIRED): Android phone 360x800, light theme only, built to be read in bright outdoor sunlight at a market stall. Product UI: plain, scannable, calm; the brand lives in precise details, not decoration. Colours: background Chalk #F3F5F2 (cool off-white, never cream); surfaces #FCFDFB with a 1px Line #D5DCD6 border; text Ink #141A16, secondary Moss Grey #4E5A52; ONE action colour, Sukuma Green #14532D (pressed #0D3B20), used only for primary buttons, the active nav item and focus rings; Deni Maize #8A5A00 text on Maize Tint #FFF1C9 for deni and warnings; Overdue Tomato #B42318 on #FDECEA only for overdue, errors and destructive actions; Slate #35556B only for M-Pesa segments in money bars. Font: Manrope only, tabular figures on every amount, format "KES 1,250", big money figures in Ink, 28-36sp bold. Radius rule: 8px on buttons, inputs, chips, list rows and cards; 16px top corners on bottom sheets only. Touch targets at least 48dp with 8dp gaps. Bilingual titles: Kiswahili title 22sp semibold in Ink, English translation directly below at 14sp in Moss Grey. Body text English. No gradients, glows, glass, emoji, em-dashes, decorative dots, avatars or illustrations.
+DESIGN SYSTEM (REQUIRED): Android phone 360x800, light theme only, built to be read in bright outdoor sunlight at a market stall. Product UI: plain, scannable, calm; the brand lives in precise details, not decoration. Colours: background Chalk #F3F5F2 (cool off-white, never cream); surfaces #FCFDFB with a 1px Line #D5DCD6 border; text Ink #141A16, secondary Moss Grey #4E5A52; ONE action colour, Sukuma Green #14532D (pressed #0D3B20), used only for primary buttons, the active nav item and focus rings; Deni Maize #8A5A00 text on Maize Tint #FFF1C9 for debts and warnings; Overdue Tomato #B42318 on #FDECEA only for overdue, errors and destructive actions; Slate #35556B only for M-Pesa segments in money bars. Font: Manrope only, tabular figures on every amount, format "KES 1,250", big money figures in Ink, 28-36sp bold. Radius rule: 8px on buttons, inputs, chips, list rows and cards; 16px top corners on bottom sheets only. Touch targets at least 48dp with 8dp gaps. ALL COPY IN ENGLISH (titles 22sp semibold Ink, one language per label, no stacked Kiswahili titles); item names and units stay as merchants say them (sukuma wiki, mayai, kilo, gunia, fundo, tray). Bottom nav: Overview, Sales, Debts, Expenses, More, at every width; no sidebar or rail. No gradients, glows, glass, emoji, em-dashes, decorative dots, avatars or illustrations.
 ```
+
+v2's block (bilingual titles) is retired; see "v3 changes" above.
 
 ---
 
@@ -812,6 +832,8 @@ Shown when a warning rule set to "block" stops a save. The merchant can still re
 ---
 
 ## 11. Translation table (Kiswahili to English)
+
+v3: the UI ships in English; this table is the source for the **Kiswahili** language option, not for on-screen bilingual titles.
 
 Native-speaker check needed for rows marked ⚑. These are titles we wrote, not established terms.
 
