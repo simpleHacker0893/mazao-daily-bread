@@ -40,9 +40,9 @@ pnpm typecheck
 pnpm test            # vitest
 pnpm e2e             # playwright
 pnpm build
-pnpm db:generate     # prisma generate (also runs on postinstall)
-pnpm db:migrate:dev  # prisma migrate dev (local / Neon dev branch)
-pnpm db:migrate      # prisma migrate deploy (production; needs DIRECT_URL)
+pnpm db:generate     # prisma contract emit (Prisma 8, D-048; also runs on postinstall)
+pnpm db:migrate:dev  # prisma migration plan --name <slug> (plans a migration from the contract diff)
+pnpm db:migrate      # prisma db migrate (applies planned migrations; uses DIRECT_URL)
 ```
 A PR is ready only when `lint`, `typecheck`, `test` and `build` pass and the step's Verify commands have been run.
 
@@ -63,3 +63,13 @@ A PR is ready only when `lint`, `typecheck`, `test` and `build` pass and the ste
 - **developer:** generalist builder for small cross-cutting tasks.
 
 The full loop is in `docs/WORKFLOW.md`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
