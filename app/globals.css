@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source not "../.claude";
+@source not "../.agents";
 
 /* Light theme only (design tokens: Surface, Ink). A2 replaces these with the full token set. */
 :root {
