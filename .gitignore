@@ -21,3 +21,11 @@ test-results/
 # OS
 .DS_Store
 Thumbs.db
+dist/
+
+# Next.js generated
+next-env.d.ts
+*.tsbuildinfo
+
+# Background agent worktrees
+.claude/worktrees/

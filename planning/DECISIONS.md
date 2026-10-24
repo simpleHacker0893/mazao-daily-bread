@@ -135,4 +135,17 @@ These are house rules. Don't re-litigate them; to change one, propose a supersed
   - "share today's summary" as plain text (Web Share API, with a copy fallback).
 
   Period reports and PDF stay in Phase 7.
+- **D-048 (Owner, 2026-10-24, supersedes the client and migration parts of D-037; overrides "stable" in D-043 for Prisma only):** The server database uses **Prisma ORM 8** (`prisma` 8.0.0-rc.27 CLI with `@prisma/orm-postgres` 8.0.0-rc.20, the newest published and the toolchain version that CLI is built on), both pinned exactly because they are release candidates.
+  - The owner chose the latest Prisma over the 7.10.1 stable line. Prisma 8 has no `@prisma/client` or `@prisma/adapter-neon`; it is contract-first.
+  - The data contract is `prisma/contract.prisma`. `prisma contract emit` writes `prisma/contract.json` and `prisma/contract.d.ts` (both committed); it runs on `postinstall` and as `pnpm db:generate`.
+  - Migrations: `prisma migration plan --name <slug>` (`pnpm db:migrate:dev`), then `prisma db migrate` (`pnpm db:migrate`). The CLI connects with `DIRECT_URL` (Neon unpooled), falling back to `DATABASE_URL`.
+  - The runtime client (`server/db.ts`, `postgres({ contract })` from `@prisma/orm-postgres`) is wired to Neon with the Neon setup; the runtime keeps using `DATABASE_URL` (pooled).
+  - Raw SQL for the conditional last-write-wins upsert uses Prisma 8's typed SQL lane (`db.sql`), never string-built SQL.
+  - Prisma 8 needs PostgreSQL 15 or newer (Neon meets this).
 
+- **D-049 (Owner, 2026-10-24, supersedes the naming parts of D-004 and D-040):** **English is the default UI language; Kiswahili is a switch.**
+  - Every string (page titles, navigation, buttons, body text) shows in English by default. The bilingual "Kiswahili title with English beneath" pattern of D-040 is dropped.
+  - The merchant can switch the whole UI to Kiswahili in Mipangilio/Settings (also offered once during sign-in or onboarding). The choice is stored on the phone in the device database `meta` table under the key `locale`.
+  - i18n contract: `i18n/en.*.ts` and `i18n/sw.*.ts`, each split into shell (Dev A) and ledger (Dev B) halves; the Kiswahili halves are typed against the English keys, so a missing translation fails typecheck. `t(key, locale = "en")`.
+  - Open (owner to confirm): whether market words from D-005 (deni, Faida Halisi, ushuru…) stay untranslated in the English UI. Until confirmed, the English UI uses plain English (Debts, Net profit) and the Kiswahili UI uses the market words.
+  - Still in force from D-040: the mobile layout (bottom nav) at every width, with no sidebar.
