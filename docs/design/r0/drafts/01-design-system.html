@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mazao Design System Style Board</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        chalk: '#F3F5F2',
+        surface: '#FCFDFB',
+        line: '#D5DCD6',
+        ink: '#141A16',
+        moss: '#4E5A52',
+        sukuma: '#14532D',
+        'sukuma-pressed': '#0D3B20',
+        maize: '#8A5A00',
+        'maize-tint': '#FFF1C9',
+        tomato: '#B42318',
+        'tomato-tint': '#FDECEA',
+        slate: '#35556B',
+      },
+      fontFamily: {
+        sans: ['Manrope', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      borderRadius: {
+        'eight': '8px',
+        'sheet': '16px',
+      }
+    }
+  }
+}
+</script>
+<style>
+  body {
+    background-color: #F3F5F2;
+    color: #141A16;
+    font-family: 'Manrope', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Consistent outline icon style: 24dp, stroke 1.75 */
+  .mazao-icon {
+    width: 24px;
+    height: 24px;
+    stroke-width: 1.75;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .mazao-icon-sm {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.75;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
+</head>
+<body class="bg-chalk text-ink p-6 md:p-10 min-h-screen">
+<div class="max-w-7xl mx-auto space-y-10">
+<!-- Header / Spec meta banner with Active Language Toggle -->
+<header class="border-b-2 border-line pb-6">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+<div>
+<div class="flex flex-wrap items-center gap-3">
+<h1 class="text-3xl font-bold tracking-tight text-ink">Mazao Design System</h1>
+<span class="px-2.5 py-1 text-xs font-semibold bg-surface border border-line rounded-[8px] text-moss">v2.0 • English Primary &amp; Swahili L10n</span>
+</div>
+<p class="text-sm text-moss mt-1 max-w-3xl leading-relaxed">
+            Sturdy, honest ledger and stall-scale tool for Kenyan market traders (Gikomba). Engineered for low-cost Android hardware in harsh direct sunlight, one-handed grip, with unambiguous tabular money figures. English is the default operational interface with full Kiswahili instant localization.
+          </p>
+</div>
+<!-- Global Language Switcher Control -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-surface border-2 border-line p-3 rounded-[8px]">
+<div class="text-xs">
+<div class="font-bold text-ink flex items-center gap-1.5">
+<svg class="mazao-icon-sm text-sukuma" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" x2="22" y1="12" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+<span>Active UI Language</span>
+</div>
+<div class="text-[11px] text-moss mt-0.5">Toggle live board translations</div>
+</div>
+<div aria-label="Language Switcher" class="inline-flex p-1 bg-chalk rounded-[8px] border border-line" role="group">
+<button class="lang-btn px-4 py-1.5 text-xs font-bold rounded-[6px] transition-all bg-sukuma text-white shadow-sm flex items-center gap-1.5" id="btn-en" onclick="setLanguage('en')" type="button">
+<span>EN</span>
+<span class="text-[10px] font-normal opacity-90">(English)</span>
+</button>
+<button class="lang-btn px-4 py-1.5 text-xs font-bold rounded-[6px] transition-all text-moss hover:text-ink hover:bg-surface flex items-center gap-1.5" id="btn-sw" onclick="setLanguage('sw')" type="button">
+<span>SW</span>
+<span class="text-[10px] font-normal opacity-90">(Kiswahili)</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Context strip -->
+<div class="mt-4 flex flex-wrap items-center justify-between text-xs text-moss gap-2 pt-3 border-t border-line/60">
+<div><strong class="text-ink">Operational Context:</strong> Gikomba Open Air Market, Nairobi • Single-hand operation</div>
+<div><strong class="text-ink">Standard:</strong> Outlined icons (24dp / 1.75 stroke) • Zero gradients, glow, or glass • 8px Radii</div>
+</div>
+</header>
+<!-- SECTION 1: COLOUR SWATCHES -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">1. Colour Swatches &amp; Semantics</h2>
+<p class="text-xs text-moss">High-contrast, glare-proof palette tested for sunlight readability</p>
+</div>
+<span class="text-xs font-mono text-moss">8 Tokens</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
+<!-- Chalk -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] border border-line bg-chalk"></div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Chalk</div>
+<div class="text-[11px] font-mono text-moss">#F3F5F2</div>
+<div class="text-[10px] text-moss mt-0.5" data-en="Canvas background" data-sw="Usuli mkuu">Canvas background</div>
+</div>
+</div>
+<!-- Surface -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] border border-line bg-surface"></div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Surface</div>
+<div class="text-[11px] font-mono text-moss">#FCFDFB</div>
+<div class="text-[10px] text-moss mt-0.5" data-en="Cards &amp; sheets" data-sw="Kadi na kurasa">Cards &amp; sheets</div>
+</div>
+</div>
+<!-- Line -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] border border-line bg-line"></div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Line</div>
+<div class="text-[11px] font-mono text-moss">#D5DCD6</div>
+<div class="text-[10px] text-moss mt-0.5" data-en="Dividers &amp; strokes" data-sw="Mistari &amp; mipaka">Dividers &amp; strokes</div>
+</div>
+</div>
+<!-- Ink -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] bg-ink"></div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Ink</div>
+<div class="text-[11px] font-mono text-moss">#141A16</div>
+<div class="text-[10px] text-moss mt-0.5" data-en="Primary text &amp; numbers" data-sw="Maandishi na nambari">Primary text &amp; numbers</div>
+</div>
+</div>
+<!-- Moss Grey -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] bg-moss"></div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Moss Grey</div>
+<div class="text-[11px] font-mono text-moss">#4E5A52</div>
+<div class="text-[10px] text-moss mt-0.5" data-en="Subtitles &amp; meta labels" data-sw="Vichwa vidogo &amp; taarifa">Subtitles &amp; meta labels</div>
+</div>
+</div>
+<!-- Sukuma Green -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] bg-sukuma flex flex-col justify-end p-1">
+<div class="text-[9px] text-white/80 font-mono">Press: #0D3B20</div>
+</div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Sukuma Green</div>
+<div class="text-[11px] font-mono text-moss">#14532D</div>
+<div class="text-[10px] text-sukuma font-semibold mt-0.5" data-en="Only action colour" data-sw="Rangi ya vitendo pekee">Only action colour</div>
+</div>
+</div>
+<!-- Deni Maize -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] bg-maize-tint border border-[#F0DF9E] flex items-center justify-center">
+<span class="text-xs font-bold text-maize">Maize</span>
+</div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Deni Maize</div>
+<div class="text-[11px] font-mono text-moss">#8A5A00 / #FFF1C9</div>
+<div class="text-[10px] text-maize font-semibold mt-0.5" data-en="Pending debt indicator" data-sw="Kiashiria cha deni">Pending debt indicator</div>
+</div>
+</div>
+<!-- Overdue Tomato -->
+<div class="bg-surface border border-line rounded-[8px] p-2.5 flex flex-col justify-between h-36">
+<div class="h-16 w-full rounded-[8px] bg-tomato-tint border border-[#F7C6C2] flex items-center justify-center">
+<span class="text-xs font-bold text-tomato">Tomato</span>
+</div>
+<div class="pt-2">
+<div class="text-xs font-bold text-ink">Overdue Tomato</div>
+<div class="text-[11px] font-mono text-moss">#B42318 / #FDECEA</div>
+<div class="text-[10px] text-tomato font-semibold mt-0.5" data-en="Errors &amp; overdue alerts" data-sw="Makosa &amp; madeni yaliyochelewa">Errors &amp; overdue alerts</div>
+</div>
+</div>
+</div>
+<!-- Slate token callout & Language Switcher Token Spec -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="bg-surface border border-line rounded-[8px] p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-[8px] bg-slate flex-shrink-0"></div>
+<div>
+<span class="text-xs font-bold text-ink">Slate</span>
+<span class="text-xs font-mono text-moss ml-2">#35556B</span>
+<span class="text-xs text-moss ml-3">Semantic: <strong class="text-ink">M-Pesa transaction data only</strong></span>
+</div>
+</div>
+<span class="text-xs font-mono bg-chalk px-2 py-0.5 rounded border border-line text-slate font-semibold">M-PESA REF</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-[8px] bg-sukuma flex items-center justify-center text-white text-[11px] font-bold">EN</div>
+<div>
+<span class="text-xs font-bold text-ink" data-en="Localization Pattern" data-sw="Mfumo wa Lugha">Localization Pattern</span>
+<span class="text-xs text-moss ml-2" data-en="English primary UI with 1-tap Swahili translation" data-sw="Kiingereza ndio msingi na Kiswahili cha mguso mmoja">English primary UI with 1-tap Swahili translation</span>
+</div>
+</div>
+<span class="text-xs font-mono bg-chal px-2 py-0.5 rounded border border-line text-sukuma font-semibold">[ EN | SW ]</span>
+</div>
+</div>
+</section>
+<!-- TWO-COLUMN LAYOUT FOR TYPE & CONTROLS -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- SECTION 2: TYPE SCALE -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">2. Type Scale (Manrope) — English Primary</h2>
+<p class="text-xs text-moss" data-en="English primary hierarchy with paired Swahili localization" data-sw="Mfumo wa Kiingereza kwanza na Kiswahili cha pili">English primary hierarchy with paired Swahili localization</p>
+</div>
+<span class="text-xs font-mono text-moss">Manrope Sans</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-5 space-y-6">
+<!-- Hero Money -->
+<div class="border-b border-line pb-4">
+<div class="text-[11px] font-mono text-moss mb-1">HERO MONEY • 36 BOLD TABULAR</div>
+<div class="text-[36px] leading-tight font-bold text-ink tabular-nums tracking-tight">
+              KES 1,340
+            </div>
+<div class="text-xs text-moss mt-1" data-en="Stall balance headline — zero risk of digit confusion" data-sw="Salio kuu la kibanda — hakuna mchanganyiko wa nambari">Stall balance headline — zero risk of digit confusion</div>
+</div>
+<!-- Screen Title Sample (English Primary, Kiswahili Subtitle / Mode) -->
+<div class="border-b border-line pb-4">
+<div class="text-[11px] font-mono text-moss mb-1">SCREEN TITLE 22/28 SEMIBOLD + LOCALIZED SUBTITLE 14/20</div>
+<div>
+<div class="text-[22px] leading-[28px] font-semibold text-ink" data-en="Sales" data-sw="Mauzo" id="type-screen-title">Sales</div>
+<div class="text-[14px] leading-[20px] font-medium text-moss" data-en="Mauzo (Kiswahili)" data-sw="Sales (English)" id="type-screen-sub">Mauzo (Kiswahili)</div>
+</div>
+<div class="text-xs text-moss mt-1.5" data-en="Primary English action headline with clear Kiswahili confirmation" data-sw="Kichwa kikuu cha Kiingereza chenye ufafanuzi wa Kiswahili">Primary English action headline with clear Kiswahili confirmation</div>
+</div>
+<!-- Section Label -->
+<div class="border-b border-line pb-4">
+<div class="text-[11px] font-mono text-moss mb-1">SECTION LABEL • 16 SEMIBOLD</div>
+<div class="text-[16px] leading-[22px] font-semibold text-ink" data-en="Today's Debts (Madeni ya Leo)" data-sw="Madeni ya Leo (Today's Debts)">Today's Debts (Madeni ya Leo)</div>
+</div>
+<!-- Body -->
+<div class="border-b border-line pb-4">
+<div class="text-[11px] font-mono text-moss mb-1">BODY • 16/24 REGULAR</div>
+<div class="text-[16px] leading-[24px] text-ink" data-en="Record sales of sukuma and onions before stall closing." data-sw="Weka rekodi ya mauzo ya sukuma na vitunguu kabla ya kufunga duka.">
+              Record sales of sukuma and onions before stall closing.
+            </div>
+<div class="text-xs text-moss mt-1" data-en="Kiswahili: Weka rekodi ya mauzo ya sukuma na vitunguu kabla ya kufunga duka." data-sw="English: Record sales of sukuma and onions before stall closing.">Kiswahili: Weka rekodi ya mauzo ya sukuma na vitunguu kabla ya kufunga duka.</div>
+</div>
+<!-- Small -->
+<div>
+<div class="text-[11px] font-mono text-moss mb-1">SMALL META • 13 REGULAR</div>
+<div class="text-[13px] leading-[18px] text-moss" data-en="Last updated 11:45 AM • Stored locally (Offline)" data-sw="Ilisasishwa saa 11:45 asubuhi • Imehifadhiwa ndani ya simu (Offline)">
+              Last updated 11:45 AM • Stored locally (Offline)
+            </div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: BUTTONS -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">3. Buttons in All States (8px Radius)</h2>
+<p class="text-xs text-moss">52dp height for reliable single-thumb reach while standing</p>
+</div>
+<span class="text-xs font-mono text-moss">52dp Touch Target</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-5 space-y-4">
+<!-- Filled Primary: Default -->
+<div>
+<div class="flex justify-between text-[11px] font-mono text-moss mb-1">
+<span>FILLED PRIMARY (DEFAULT)</span>
+<span>52dp / Sukuma Green #14532D</span>
+</div>
+<button class="w-full h-[52px] bg-sukuma text-white text-[16px] font-semibold rounded-[8px] flex items-center justify-center gap-2 shadow-sm active:bg-sukuma-pressed" type="button">
+<span data-en="Save Sale (Hifadhi Mauzo)" data-sw="Hifadhi Mauzo (Save Sale)">Save Sale (Hifadhi Mauzo)</span>
+</button>
+</div>
+<!-- Filled Primary: Pressed -->
+<div>
+<div class="flex justify-between text-[11px] font-mono text-moss mb-1">
+<span>FILLED PRIMARY (PRESSED STATE)</span>
+<span>Pressed #0D3B20</span>
+</div>
+<button class="w-full h-[52px] bg-sukuma-pressed text-white text-[16px] font-semibold rounded-[8px] flex items-center justify-center gap-2 ring-2 ring-ink/20" type="button">
+<span data-en="Save Sale (Hifadhi Mauzo)" data-sw="Hifadhi Mauzo (Save Sale)">Save Sale (Hifadhi Mauzo)</span>
+</button>
+</div>
+<!-- Filled Primary: Loading -->
+<div>
+<div class="flex justify-between text-[11px] font-mono text-moss mb-1">
+<span>FILLED PRIMARY (LOADING)</span>
+<span>In-progress</span>
+</div>
+<button class="w-full h-[52px] bg-sukuma text-white text-[16px] font-semibold rounded-[8px] flex items-center justify-center gap-2.5 opacity-95" type="button">
+<svg class="animate-spin h-5 w-5 text-white" fill="none" viewbox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+<span data-en="Saving... (Inahifadhi...)" data-sw="Inahifadhi... (Saving...)">Saving... (Inahifadhi...)</span>
+</button>
+</div>
+<!-- Filled Primary: Disabled -->
+<div>
+<div class="flex justify-between text-[11px] font-mono text-moss mb-1">
+<span>FILLED PRIMARY (DISABLED)</span>
+<span>Line fill #D5DCD6 / Moss text</span>
+</div>
+<button class="w-full h-[52px] bg-line text-moss text-[16px] font-semibold rounded-[8px] flex items-center justify-center cursor-not-allowed" disabled="" type="button">
+<span data-en="Save Sale (Hifadhi Mauzo)" data-sw="Hifadhi Mauzo (Save Sale)">Save Sale (Hifadhi Mauzo)</span>
+</button>
+</div>
+<!-- Secondary Outlined & Text Button Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+<div>
+<div class="text-[11px] font-mono text-moss mb-1">OUTLINED SECONDARY (52dp)</div>
+<button class="w-full h-[52px] bg-surface border-2 border-line text-ink text-[16px] font-semibold rounded-[8px] flex items-center justify-center hover:bg-chalk" type="button">
+<span data-en="Cancel (Ghairi)" data-sw="Ghairi (Cancel)">Cancel (Ghairi)</span>
+</button>
+</div>
+<div>
+<div class="text-[11px] font-mono text-moss mb-1">TEXT BUTTON (52dp)</div>
+<button class="w-full h-[52px] text-sukuma text-[16px] font-semibold rounded-[8px] flex items-center justify-center hover:bg-chalk" type="button">
+<span data-en="Edit Due Date (Badilisha Tarehe)" data-sw="Badilisha Tarehe ya Kulipa">Edit Due Date (Badilisha Tarehe)</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- ROW: CHIPS & MONEY ROWS & INPUT -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- SECTION 4: CHIPS -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">4. Chips (44dp, 8px Radius)</h2>
+<p class="text-xs text-moss">Generous touch target for wet or dusty market hands</p>
+</div>
+<span class="text-xs font-mono text-moss">44dp height</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-4 space-y-4">
+<!-- Filter chips -->
+<div>
+<div class="text-[11px] font-mono text-moss mb-2" data-en="FILTER CHIPS (TIME WINDOW)" data-sw="VICHUJIO VYA MUDA">FILTER CHIPS (TIME WINDOW)</div>
+<div class="flex flex-wrap gap-2">
+<button class="h-[44px] px-4 bg-sukuma text-white font-semibold text-sm rounded-[8px] flex items-center gap-1.5 shadow-sm" type="button">
+<svg class="mazao-icon-sm" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+<span data-en="Today" data-sw="Leo">Today</span>
+</button>
+<button class="h-[44px] px-4 bg-surface border border-line text-ink font-semibold text-sm rounded-[8px] flex items-center hover:bg-chalk" type="button">
+<span data-en="Yesterday" data-sw="Jana">Yesterday</span>
+</button>
+<button class="h-[44px] px-4 bg-surface border border-line text-ink font-semibold text-sm rounded-[8px] flex items-center hover:bg-chalk" type="button">
+<span data-en="This Week" data-sw="Wiki Hii">This Week</span>
+</button>
+</div>
+</div>
+<!-- Choice chips -->
+<div class="border-t border-line pt-3">
+<div class="text-[11px] font-mono text-moss mb-2" data-en="CHOICE CHIPS (DUE DATE)" data-sw="TAREHE YA KULIPA">CHOICE CHIPS (DUE DATE)</div>
+<div class="flex flex-wrap gap-2">
+<button class="h-[44px] px-4 bg-surface border-2 border-sukuma text-sukuma font-semibold text-sm rounded-[8px] flex items-center" type="button">
+<span data-en="Tomorrow" data-sw="Kesho">Tomorrow</span>
+</button>
+<button class="h-[44px] px-4 bg-surface border border-line text-ink font-semibold text-sm rounded-[8px] flex items-center hover:bg-chalk" type="button">
+<span data-en="Friday" data-sw="Ijumaa">Friday</span>
+</button>
+<button class="h-[44px] px-4 bg-surface border border-line text-ink font-semibold text-sm rounded-[8px] flex items-center hover:bg-chalk" type="button">
+<span data-en="Next Week" data-sw="Wiki Ijayo">Next Week</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: MONEY ROWS -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">5. Money Rows (Tabular)</h2>
+<p class="text-xs text-moss">Colored vertical status edge bar</p>
+</div>
+<span class="text-xs font-mono text-moss">Left Bar 4px</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-4 space-y-3">
+<!-- Otieno Ouma (Overdue Tomato) -->
+<div class="relative bg-surface border border-line rounded-[8px] overflow-hidden pl-4 pr-3.5 py-3 flex items-center justify-between">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-tomato"></div>
+<div>
+<div class="text-[15px] font-bold text-ink">Otieno Ouma</div>
+<div class="text-xs text-tomato font-semibold" data-en="Overdue 4 days" data-sw="Deni limechelewa siku 4">Overdue 4 days</div>
+</div>
+<div class="text-right">
+<div class="text-[17px] font-bold text-ink tabular-nums tracking-tight">KES 1,200</div>
+<div class="text-[11px] font-mono text-moss" data-en="Unpaid / Debt" data-sw="Deni">Unpaid / Debt</div>
+</div>
+</div>
+<!-- Wanjiku (Maize) -->
+<div class="relative bg-surface border border-line rounded-[8px] overflow-hidden pl-4 pr-3.5 py-3 flex items-center justify-between">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-maize"></div>
+<div>
+<div class="text-[15px] font-bold text-ink">Wanjiku</div>
+<div class="text-xs text-maize font-semibold" data-en="Due Friday" data-sw="Linalipwa Ijumaa">Due Friday</div>
+</div>
+<div class="text-right">
+<div class="text-[17px] font-bold text-ink tabular-nums tracking-tight">KES 450</div>
+<div class="text-[11px] font-mono text-moss" data-en="Debt" data-sw="Deni">Debt</div>
+</div>
+</div>
+<!-- Normal / Completed sample for contrast -->
+<div class="relative bg-surface border border-line rounded-[8px] overflow-hidden pl-4 pr-3.5 py-3 flex items-center justify-between">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-sukuma"></div>
+<div>
+<div class="text-[15px] font-bold text-ink">Mama Mboga</div>
+<div class="text-xs text-sukuma font-semibold" data-en="Paid in full (Cash)" data-sw="Imelipwa kamili (Taslimu)">Paid in full (Cash)</div>
+</div>
+<div class="text-right">
+<div class="text-[17px] font-bold text-ink tabular-nums tracking-tight">KES 2,800</div>
+<div class="text-[11px] font-mono text-moss" data-en="Cash" data-sw="Taslimu">Cash</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 6: TEXT INPUT -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">6. Form Inputs &amp; Error State</h2>
+<p class="text-xs text-moss">56dp touch targets with high-visibility validation</p>
+</div>
+<span class="text-xs font-mono text-moss">56dp Material 3</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-4 space-y-4">
+<!-- Text input with error -->
+<div>
+<label class="block text-xs font-semibold text-tomato mb-1">
+<span data-en="Amount (KES)" data-sw="Kiasi (KES)">Amount (KES)</span> <span class="text-tomato">*</span>
+</label>
+<div class="relative">
+<input class="w-full h-[54px] bg-tomato-tint border-2 border-tomato rounded-[8px] px-3.5 text-[18px] font-bold text-ink placeholder:text-moss/50 focus:outline-none tabular-nums" placeholder="0" type="text" value=""/>
+<div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-tomato">
+<svg class="mazao-icon" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+</div>
+</div>
+<div class="flex items-center gap-1.5 mt-1.5 text-xs font-semibold text-tomato">
+<svg class="mazao-icon-sm" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+<span data-en="Enter an amount (Weka kiasi)" data-sw="Weka kiasi (Enter an amount)">Enter an amount (Weka kiasi)</span>
+</div>
+</div>
+<!-- Normal filled input sample -->
+<div class="border-t border-line pt-3">
+<label class="block text-xs font-semibold text-ink mb-1" data-en="Customer Name (Jina la Mteja)" data-sw="Jina la Mteja (Customer Name)">
+              Customer Name (Jina la Mteja)
+            </label>
+<input class="w-full h-[52px] bg-chalk border border-line rounded-[8px] px-3.5 text-[15px] font-semibold text-ink focus:outline-none" readonly="" type="text" value="Kamau Waithaka"/>
+</div>
+</div>
+</section>
+</div>
+<!-- ROW: SYNC CHIPS & SKELETON LOADER & SNACKBAR -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- SECTION 7: SYNC CHIP (3 STATES) -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">7. Sync Status &amp; Connectivity</h2>
+<p class="text-xs text-moss">Explicit connectivity &amp; backup status chips</p>
+</div>
+<span class="text-xs font-mono text-moss">Cloud Sync</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-4 space-y-3">
+<!-- State 1: Backed up to cloud -->
+<div>
+<div class="text-[11px] font-mono text-moss mb-1">STATE 1: BACKED UP (CLOUD-CHECK)</div>
+<div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-chalk border border-line text-sukuma text-xs font-bold">
+<svg class="mazao-icon-sm text-sukuma" viewbox="0 0 24 24">
+<path d="M19 16.9A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
+<polyline points="9 11 12 14 17 9"></polyline>
+</svg>
+<span data-en="Backed up to cloud" data-sw="Imehifadhiwa mtandaoni">Backed up to cloud</span>
+</div>
+</div>
+<!-- State 2: 3 items not backed up -->
+<div>
+<div class="text-[11px] font-mono text-moss mb-1">STATE 2: NOT BACKED UP (3 PENDING)</div>
+<div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-chalk border border-line text-moss text-xs font-bold">
+<svg class="mazao-icon-sm text-moss" viewbox="0 0 24 24">
+<path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0-1 7.25A5 5 0 0 0 6 22h12a4.93 4.93 0 0 0 2-.42"></path>
+<line x1="2" x2="22" y1="2" y2="22"></line>
+</svg>
+<span data-en="3 items not backed up • On this phone only" data-sw="Rekodi 3 hazijahifadhiwa • Simu pekee">3 items not backed up • On this phone only</span>
+</div>
+</div>
+<!-- State 3: Sign in to back up -->
+<div>
+<div class="text-[11px] font-mono text-moss mb-1">STATE 3: SIGN IN TO BACK UP (MAIZE)</div>
+<div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-maize-tint border border-[#F0DF9E] text-maize text-xs font-bold">
+<svg class="mazao-icon-sm text-maize" viewbox="0 0 24 24">
+<path d="M19 16.9A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
+<line x1="12" x2="12" y1="9" y2="13"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+<span data-en="Sign in to back up" data-sw="Ingia kuhifadhi">Sign in to back up</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 10: SKELETON LOADER -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">10. Skeleton Loader Row</h2>
+<p class="text-xs text-moss">Identical geometry to real ledger money row</p>
+</div>
+<span class="text-xs font-mono text-moss">Content Mirror</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-4 space-y-3">
+<div class="text-[11px] font-mono text-moss">SKELETON ROW (NO CONTENT SHIFT)</div>
+<!-- Skeleton card with left indicator bar placeholder -->
+<div class="relative bg-surface border border-line rounded-[8px] overflow-hidden pl-4 pr-3.5 py-3.5 flex items-center justify-between animate-pulse">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-line"></div>
+<div class="space-y-2">
+<div class="h-4 w-32 bg-line rounded"></div>
+<div class="h-3 w-20 bg-line/60 rounded"></div>
+</div>
+<div class="space-y-2 flex flex-col items-end">
+<div class="h-5 w-24 bg-line rounded"></div>
+<div class="h-3 w-12 bg-line/60 rounded"></div>
+</div>
+</div>
+<div class="relative bg-surface border border-line rounded-[8px] overflow-hidden pl-4 pr-3.5 py-3.5 flex items-center justify-between animate-pulse">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-line"></div>
+<div class="space-y-2">
+<div class="h-4 w-28 bg-line rounded"></div>
+<div class="h-3 w-24 bg-line/60 rounded"></div>
+</div>
+<div class="space-y-2 flex flex-col items-end">
+<div class="h-5 w-20 bg-line rounded"></div>
+<div class="h-3 w-10 bg-line/60 rounded"></div>
+</div>
+</div>
+<div class="text-[11px] text-moss">Pulsing uses solid Line tone (#D5DCD6); no shimmer gradient.</div>
+</div>
+</section>
+<!-- SECTION 11: SNACKBAR -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">11. Material 3 Snackbar</h2>
+<p class="text-xs text-moss">Decisive market flow: View only, no Undo</p>
+</div>
+<span class="text-xs font-mono text-moss">Transient Banner</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-4 flex flex-col justify-between h-[190px]">
+<div>
+<div class="text-[11px] font-mono text-moss mb-2">SNACKBAR SPECIFICATION</div>
+<p class="text-xs text-moss leading-relaxed" data-en="In fast-paced stall sales, trades are finalized immediately. Undo is avoided to prevent tally mismatches; users can quickly 'View' the entry." data-sw="Katika biashara ya haraka ya soko, mauzo yanahitimishwa mara moja. Kitendo cha 'View / Tazama' kinathibitisha rekodi.">
+              In fast-paced stall sales, trades are finalized immediately. Undo is avoided to prevent tally mismatches; users can quickly "View" the entry.
+            </p>
+</div>
+<!-- The actual snackbar -->
+<div class="bg-ink text-white rounded-[8px] px-4 py-3 flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-2.5">
+<svg class="mazao-icon text-sukuma" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10" stroke="#14532D"></circle>
+<path d="M8 12l2.5 2.5L16 9" stroke="#FCFDFB"></path>
+</svg>
+<span class="text-sm font-medium text-[#FCFDFB]" data-en="Sale saved." data-sw="Mauzo yamehifadhiwa.">Sale saved.</span>
+</div>
+<button class="text-sm font-bold text-[#FFF1C9] hover:underline px-2 py-1" data-en="View" data-sw="Tazama" type="button">
+              View
+            </button>
+</div>
+</div>
+</section>
+</div>
+<!-- ROW: BOTTOM NAVIGATION & BOTTOM SHEET -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- SECTION 8: BILINGUAL BOTTOM NAVIGATION -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">8. Bottom Navigation (5 Destinations)</h2>
+<p class="text-xs text-moss" data-en="English primary caption 12sp over Kiswahili context 11sp • Active: Sukuma Green" data-sw="Kiswahili kikuu 12sp chenye Kiingereza 11sp • Hai: Sukuma Green">English primary caption 12sp over Kiswahili context 11sp • Active: Sukuma Green</p>
+</div>
+<span class="text-xs font-mono text-moss">56dp Mobile Bar</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-5 space-y-3">
+<div class="text-[11px] font-mono text-moss">M3 BOTTOM NAVIGATION COMPONENT</div>
+<!-- Bottom Navigation Bar representation -->
+<nav aria-label="Bottom navigation bar" class="bg-surface border-2 border-line rounded-[8px] shadow-sm flex items-center justify-around py-2 px-1">
+<!-- 1. Overview (Active) -->
+<button class="flex flex-col items-center justify-center flex-1 py-1 text-sukuma" type="button">
+<div class="bg-sukuma/10 px-3 py-0.5 rounded-full mb-1">
+<svg class="mazao-icon text-sukuma" viewbox="0 0 24 24">
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+</div>
+<span class="text-[12px] leading-tight font-bold" data-en="Overview" data-sw="Muhtasari">Overview</span>
+<span class="text-[11px] leading-tight font-medium text-sukuma/80" data-en="Muhtasari" data-sw="Overview">Muhtasari</span>
+</button>
+<!-- 2. Sales -->
+<button class="flex flex-col items-center justify-center flex-1 py-1 text-moss hover:text-ink" type="button">
+<div class="px-3 py-0.5 mb-1">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<line x1="12" x2="12" y1="1" y2="23"></line>
+<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+</svg>
+</div>
+<span class="text-[12px] leading-tight font-semibold text-ink" data-en="Sales" data-sw="Mauzo">Sales</span>
+<span class="text-[11px] leading-tight text-moss" data-en="Mauzo" data-sw="Sales">Mauzo</span>
+</button>
+<!-- 3. Debts -->
+<button class="flex flex-col items-center justify-center flex-1 py-1 text-moss hover:text-ink" type="button">
+<div class="px-3 py-0.5 mb-1">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+<polyline points="14 2 14 8 20 8"></polyline>
+<line x1="16" x2="8" y1="13" y2="13"></line>
+<line x1="16" x2="8" y1="17" y2="17"></line>
+</svg>
+</div>
+<span class="text-[12px] leading-tight font-semibold text-ink" data-en="Debts" data-sw="Deni">Debts</span>
+<span class="text-[11px] leading-tight text-moss" data-en="Deni" data-sw="Debts">Deni</span>
+</button>
+<!-- 4. Expenses -->
+<button class="flex flex-col items-center justify-center flex-1 py-1 text-moss hover:text-ink" type="button">
+<div class="px-3 py-0.5 mb-1">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<line x1="2" x2="22" y1="10" y2="10"></line>
+</svg>
+</div>
+<span class="text-[12px] leading-tight font-semibold text-ink" data-en="Expenses" data-sw="Gharama">Expenses</span>
+<span class="text-[11px] leading-tight text-moss" data-en="Gharama" data-sw="Expenses">Gharama</span>
+</button>
+<!-- 5. More -->
+<button class="flex flex-col items-center justify-center flex-1 py-1 text-moss hover:text-ink" type="button">
+<div class="px-3 py-0.5 mb-1">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="1"></circle>
+<circle cx="12" cy="5" r="1"></circle>
+<circle cx="12" cy="19" r="1"></circle>
+</svg>
+</div>
+<span class="text-[12px] leading-tight font-semibold text-ink" data-en="More" data-sw="Zaidi">More</span>
+<span class="text-[11px] leading-tight text-moss" data-en="Zaidi" data-sw="More">Zaidi</span>
+</button>
+</nav>
+<div class="text-xs text-moss">Strict single outline icon family (stroke 1.75). No emoji or filled shapes.</div>
+</div>
+</section>
+<!-- SECTION 9: BOTTOM SHEET -->
+<section class="space-y-4">
+<div class="border-b border-line pb-2 flex items-center justify-between">
+<div>
+<h2 class="text-base font-semibold text-ink">9. Bottom Sheet (16px Top Corners Only)</h2>
+<p class="text-xs text-moss" data-en="Primary title 'More Options' with English first navigation" data-sw="Kichwa cha 'Chaguo Zaidi' chenye Kiswahili kwanza">Primary title "More Options" with English first navigation</p>
+</div>
+<span class="text-xs font-mono text-moss">Rounded Top 16px</span>
+</div>
+<div class="bg-surface border border-line rounded-[8px] p-5">
+<!-- The Bottom Sheet Component itself -->
+<div class="bg-surface border-2 border-line rounded-t-[16px] rounded-b-none p-5 shadow-md">
+<!-- Handle -->
+<div class="w-10 h-1 bg-line rounded-full mx-auto mb-4"></div>
+<!-- Header -->
+<div class="border-b border-line pb-3 mb-2 flex items-center justify-between">
+<div>
+<div class="text-[20px] font-semibold text-ink leading-tight" data-en="More Options" data-sw="Chaguo Zaidi">More Options</div>
+<div class="text-[13px] font-medium text-moss" data-en="Chaguo Zaidi (Kiswahili)" data-sw="More Options (English)">Chaguo Zaidi (Kiswahili)</div>
+</div>
+<span class="text-[11px] font-mono bg-chalk border border-line px-2 py-0.5 rounded text-moss">4 Items</span>
+</div>
+<!-- List items -->
+<ul class="divide-y divide-line">
+<!-- Purchases / Manunuzi -->
+<li>
+<button class="w-full py-3 flex items-center justify-between text-left hover:bg-chalk/50 rounded px-1" type="button">
+<div class="flex items-center gap-3">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<circle cx="9" cy="21" r="1"></circle>
+<circle cx="20" cy="21" r="1"></circle>
+<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+</svg>
+<div>
+<div class="text-[15px] font-semibold text-ink" data-en="Purchases" data-sw="Manunuzi">Purchases</div>
+<div class="text-[12px] text-moss" data-en="Manunuzi (Wholesale stock)" data-sw="Kununua bidhaa za jumla">Manunuzi (Wholesale stock)</div>
+</div>
+</div>
+<svg class="mazao-icon-sm text-moss" viewbox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+</li>
+<!-- Stock & Items / Bidhaa na Stoki -->
+<li>
+<button class="w-full py-3 flex items-center justify-between text-left hover:bg-chalk/50 rounded px-1" type="button">
+<div class="flex items-center gap-3">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+<polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+<line x1="12" x2="12" y1="22.08" y2="12"></line>
+</svg>
+<div>
+<div class="text-[15px] font-semibold text-ink" data-en="Stock &amp; Items" data-sw="Bidhaa na Stoki">Stock &amp; Items</div>
+<div class="text-[12px] text-moss" data-en="Bidhaa na Stoki" data-sw="Stock &amp; Items">Bidhaa na Stoki</div>
+</div>
+</div>
+<svg class="mazao-icon-sm text-moss" viewbox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+</li>
+<!-- Reports / Ripoti -->
+<li>
+<button class="w-full py-3 flex items-center justify-between text-left hover:bg-chalk/50 rounded px-1" type="button">
+<div class="flex items-center gap-3">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<line x1="18" x2="18" y1="20" y2="10"></line>
+<line x1="12" x2="12" y1="20" y2="4"></line>
+<line x1="6" x2="6" y1="20" y2="14"></line>
+</svg>
+<div>
+<div class="text-[15px] font-semibold text-ink" data-en="Reports" data-sw="Ripoti">Reports</div>
+<div class="text-[12px] text-moss" data-en="Ripoti za biashara (Tally summary)" data-sw="Ripoti za faida na madeni">Ripoti za biashara (Tally summary)</div>
+</div>
+</div>
+<svg class="mazao-icon-sm text-moss" viewbox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+</li>
+<!-- Settings & Language / Mipangilio na Lugha -->
+<li>
+<button class="w-full py-3 flex items-center justify-between text-left hover:bg-chalk/50 rounded px-1" type="button">
+<div class="flex items-center gap-3">
+<svg class="mazao-icon text-moss" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="3"></circle>
+<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+</svg>
+<div>
+<div class="text-[15px] font-semibold text-ink" data-en="Settings &amp; Language" data-sw="Mipangilio na Lugha">Settings &amp; Language</div>
+<div class="text-[12px] text-moss" data-en="English / Kiswahili toggle &amp; backup" data-sw="Badilisha lugha &amp; nakala ya simu">English / Kiswahili toggle &amp; backup</div>
+</div>
+</div>
+<svg class="mazao-icon-sm text-moss" viewbox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</div>
+<!-- SYSTEM GOVERNANCE FOOTER -->
+<footer class="border-t-2 border-line pt-6 pb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-moss gap-4">
+<div class="space-y-1">
+<div class="font-bold text-ink">Mazao Market UI Rules Enforced:</div>
+<div>English primary interface • Instant single-tap Swahili localization • 52dp button targets • 8px Radii • Zero gradients, glow, or cards-in-cards</div>
+</div>
+<div class="font-mono text-ink bg-surface border border-line px-3 py-1.5 rounded-[8px]">
+        DESIGN SYSTEM TOKEN REGISTRY • MAZAO-M3-LIGHT-EN-SW
+      </div>
+</footer>
+</div>
+<!-- Vanilla JS Localization Switcher Script -->
+<script>
+    let currentLang = 'en';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      
+      // Update UI toggle buttons
+      const btnEn = document.getElementById('btn-en');
+      const btnSw = document.getElementById('btn-sw');
+      
+      if (lang === 'en') {
+        btnEn.className = 'lang-btn px-4 py-1.5 text-xs font-bold rounded-[6px] transition-all bg-sukuma text-white shadow-sm flex items-center gap-1.5';
+        btnSw.className = 'lang-btn px-4 py-1.5 text-xs font-bold rounded-[6px] transition-all text-moss hover:text-ink hover:bg-surface flex items-center gap-1.5';
+      } else {
+        btnSw.className = 'lang-btn px-4 py-1.5 text-xs font-bold rounded-[6px] transition-all bg-sukuma text-white shadow-sm flex items-center gap-1.5';
+        btnEn.className = 'lang-btn px-4 py-1.5 text-xs font-bold rounded-[6px] transition-all text-moss hover:text-ink hover:bg-surface flex items-center gap-1.5';
+      }
+
+      // Update all elements with data-en and data-sw
+      const translatableElements = document.querySelectorAll('[data-en][data-sw]');
+      translatableElements.forEach(el => {
+        const text = el.getAttribute('data-' + lang);
+        if (text) {
+          el.innerHTML = text;
+        }
+      });
+    }
+
+    // Initialize to default English
+    document.addEventListener('DOMContentLoaded', () => {
+      setLanguage('en');
+    });
+  </script>
+</body></html>

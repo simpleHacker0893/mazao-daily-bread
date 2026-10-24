@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="sw" class="bg-[#F3F5F2] text-[#141A16] antialiased">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mazao - Daftari lako la biashara</title>
+  <!-- Google Fonts: Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            chalk: '#F3F5F2',
+            surface: '#FCFDFB',
+            ink: '#141A16',
+            moss: '#4E5A52',
+            sukuma: '#14532D',
+            sukumaPressed: '#0D381E',
+            line: '#D5DCD6',
+            maize: '#8A5A00',
+            tomato: '#B42318'
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+          },
+          borderRadius: {
+            'custom': '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Manrope', sans-serif;
+      background-color: #F3F5F2;
+      color: #141A16;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .num-tabular {
+      font-variant-numeric: tabular-nums;
+    }
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+    details summary {
+      list-style: none;
+    }
+  </style>
+</head>
+<body class="w-full max-w-[360px] mx-auto bg-chalk min-h-screen border-x border-line relative flex flex-col selection:bg-sukuma selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- 1. HEADER (One line 64px)                  -->
+  <!-- ========================================== -->
+  <header class="h-16 px-4 bg-surface border-b border-line flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center">
+      <span class="text-2xl font-extrabold tracking-tight text-ink">Mazao</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="#signin" class="text-[13px] font-semibold text-moss hover:text-ink transition-colors py-2 px-1">
+        Ingia <span class="text-[11px] font-normal text-moss block -mt-1 leading-none">Sign in</span>
+      </a>
+      <a href="#signup" class="h-10 px-3.5 bg-sukuma active:bg-sukumaPressed text-white rounded-[8px] text-[13px] font-bold flex items-center justify-center transition-colors">
+        Anza bure
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-1 flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- 2. HERO SECTION                           -->
+    <!-- ========================================== -->
+    <section class="p-4 pt-6 flex flex-col gap-5 bg-chalk border-b border-line">
+      <!-- Copy Stack -->
+      <div class="flex flex-col">
+        <h1 class="text-[26px] font-extrabold leading-[1.2] text-ink tracking-tight">
+          Daftari lako la biashara, sasa kwenye simu.
+        </h1>
+        <p class="text-[14px] text-moss mt-1.5 font-normal leading-[1.35]">
+          Your business notebook on your phone.
+        </p>
+        <p class="text-[14px] text-ink mt-3 font-medium leading-[1.4]">
+          Sales, deni and real profit, even with no network.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-2.5">
+        <a href="#signup" class="h-[52px] bg-sukuma active:bg-sukumaPressed text-white rounded-[8px] text-[15px] font-bold flex items-center justify-center transition-colors shadow-none text-center">
+          Anza bure / Start free
+        </a>
+        <a href="#how-it-works" class="h-10 flex items-center justify-center text-[14px] font-semibold text-moss hover:text-ink transition-colors">
+          See how it works
+        </a>
+      </div>
+
+      <!-- Photo & Phone Frame Composition -->
+      <div class="relative mt-2">
+        <!-- Photo Cell: Mama mboga with sukuma & tomatoes -->
+        <div class="w-full h-[220px] rounded-[8px] overflow-hidden border border-line bg-surface">
+          <img 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfc0KGMJu9iCfVahDvE1i7_1shCU7uvOrN2wv1rSeujGR-_rcGzGnLvH2bWmoteoqJpXAK5l70mjFDwLztwiKR0yFL49ivjv6z_5JneYCjjyvYOZNSi9YKoOHtt3S_HeBL3YRV2PKVLI2nbS9VFkm5hZ_tOXhaFimYmFV7tX3hdYBXj2YOU-FKWyuT5DdAae2FdFeKzO7XPA08CMUki5kxu0LVkBOOQLyDqTJvOjuqFz0-8QW2urYzEkzvuE8eGxWe-nxUTJ01pt0" 
+            alt="Kenyan market woman at her produce stall in Gikomba" 
+            class="w-full h-full object-cover object-center"
+            loading="eager"
+          />
+        </div>
+
+        <!-- Floating Phone Frame: Muhtasari preview partly overlapping lower-left -->
+        <div class="absolute -bottom-4 left-3 w-[200px] bg-surface rounded-[8px] border-2 border-ink shadow-sm p-3 z-10">
+          <div class="flex items-center justify-between pb-1.5 border-b border-line mb-2">
+            <span class="text-[11px] font-bold text-ink">Muhtasari</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#F3F5F2] font-semibold text-moss">Leo (Today)</span>
+          </div>
+          <div class="text-[9px] text-moss font-semibold uppercase tracking-wider">Mauzo ya Leo</div>
+          <div class="text-[18px] font-extrabold text-ink num-tabular tracking-tight">KES 4,850</div>
+          <div class="mt-1.5 flex items-center justify-between text-[10px] pt-1.5 border-t border-line">
+            <span class="text-moss">Deni mpya</span>
+            <span class="font-bold text-maize num-tabular">KES 600</span>
+          </div>
+        </div>
+      </div>
+      <!-- Spacer for phone frame overlap -->
+      <div class="h-4"></div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 3. PAPER NOTEBOOK VS MAZAO                -->
+    <!-- ========================================== -->
+    <section id="how-it-works" class="p-4 py-8 bg-surface border-b border-line flex flex-col gap-5">
+      <!-- Photo: Close-up of hands writing deni names with biro -->
+      <div class="w-full h-[180px] rounded-[8px] overflow-hidden border border-line bg-chalk">
+        <img 
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXUFNnmpLqZQGRh0pn3Morjk6TMfVNbOKSGx17_gqNht04swAUe4n00iFaowUOobO0PsEycu-vMYbLfHlyYkzmUwbOLgYSLA-UaVZqxzohUn4JXLnQfBzMtjiGbZ5woap9XpUHv9CAA6Cowhr5jYX21Kep3HHt27bDVBxwSMv76Xssu3mL30VTE_MDRLdsPuumWoDvoreIgKuq-JNmGXQIjmbFupN8hal0be2odFj_x0Gb7eEMeHtP9Ge53IXwU9DtZ60edoCtERg" 
+          alt="Hands writing customer debt in a school exercise book with a blue biro" 
+          class="w-full h-full object-cover object-center"
+          loading="lazy"
+        />
+      </div>
+
+      <!-- Bilingual Heading -->
+      <div class="flex flex-col">
+        <h2 class="text-[21px] font-extrabold text-ink leading-tight">
+          Daftari linalokupigia hesabu
+        </h2>
+        <span class="text-[13px] text-moss font-normal mt-0.5">
+          A notebook that does the maths for you
+        </span>
+      </div>
+
+      <!-- Four Grouped Rows -->
+      <div class="flex flex-col divide-y divide-line border border-line rounded-[8px] bg-chalk/60 overflow-hidden">
+        
+        <!-- Row 1 -->
+        <div class="p-3.5 flex items-start gap-3 bg-surface">
+          <div class="w-6 h-6 rounded-[8px] bg-chalk border border-line flex-shrink-0 flex items-center justify-center mt-0.5">
+            <svg class="w-3.5 h-3.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[14px] font-bold text-ink leading-snug">Who owes you, and since when</span>
+            <span class="text-[12px] text-moss mt-0.5 leading-snug">Jua mara moja nani anadaiwa na siku ngapi zimepita.</span>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="p-3.5 flex items-start gap-3 bg-surface">
+          <div class="w-6 h-6 rounded-[8px] bg-chalk border border-line flex-shrink-0 flex items-center justify-center mt-0.5">
+            <svg class="w-3.5 h-3.5 text-sukuma" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[14px] font-bold text-ink leading-snug">Profit after the cost of goods and expenses</span>
+            <span class="text-[12px] text-moss mt-0.5 leading-snug">Faida kamili baada ya kutoa gharama za mzigo na usafiri.</span>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="p-3.5 flex items-start gap-3 bg-surface">
+          <div class="w-6 h-6 rounded-[8px] bg-chalk border border-line flex-shrink-0 flex items-center justify-center mt-0.5">
+            <svg class="w-3.5 h-3.5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-2.828-6.364 9 9 0 012.828-6.364m2.829 2.828a5 5 0 000 7.072M3 3l18 18" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[14px] font-bold text-ink leading-snug">Works with no network</span>
+            <span class="text-[12px] text-moss mt-0.5 leading-snug">Haitaji bando wala stima kufungua na kuandika mauzo.</span>
+          </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="p-3.5 flex items-start gap-3 bg-surface">
+          <div class="w-6 h-6 rounded-[8px] bg-chalk border border-line flex-shrink-0 flex items-center justify-center mt-0.5">
+            <svg class="w-3.5 h-3.5 text-moss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[14px] font-bold text-ink leading-snug">Backed up if you lose your phone</span>
+            <span class="text-[12px] text-moss mt-0.5 leading-snug">Simu ikipotea au kuharibika, akaunti yako inarudisha kila kitu.</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 4. OFFLINE STORY                          -->
+    <!-- ========================================== -->
+    <section class="bg-chalk border-b border-line">
+      <!-- Full-bleed photo of crowded Gikomba aisle with sacks -->
+      <div class="w-full h-[220px] overflow-hidden bg-surface">
+        <img 
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-LB-adsj9RwdMJBCNF1T7M_DCEc7ELBgOZ_b5HqjJzrXSgnN5-ZGUbJv1oOLfLYegHn-BnhOqYUw3aWmJ1UtKQtyo2YwWl_9Kls1YMM-VVy6ECHNc2MD8nqGy2kgos0zuF8WcftFI5VxiW6hF1_9q4tmjn0WOMLiLqi8jCzh9yIYpmsDXh2kMGWqsjzVIXVSUbkEo7EOxmXu-kJCGDCLlN8QK8bGVL6ZVIWDoeKn2q2XMvXp_l_WwTXsEhbjpVUMkUIDU_l6nwW4" 
+          alt="Crowded Gikomba market aisle in Nairobi with sacks of produce" 
+          class="w-full h-full object-cover object-center"
+          loading="lazy"
+        />
+      </div>
+
+      <!-- Text below it (not on it) -->
+      <div class="p-4 py-6 flex flex-col">
+        <h2 class="text-[22px] font-extrabold text-ink leading-tight">
+          Hakuna mtandao? Sawa.
+        </h2>
+        <span class="text-[14px] text-moss font-medium mt-0.5">
+          No network? Fine.
+        </span>
+        <p class="text-[14px] text-ink font-normal mt-3 leading-[1.45]">
+          Everything saves on your phone first and backs up when you connect.
+        </p>
+
+        <!-- Offline Status indicator pill -->
+        <div class="mt-4 p-3 bg-surface border border-line rounded-[8px] flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-sukuma flex-shrink-0"></div>
+          <span class="text-[12px] text-ink font-semibold">Imehifadhiwa ndani ya simu (Offline)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 5. DENI YOU CAN SEE                       -->
+    <!-- ========================================== -->
+    <section class="p-4 py-8 bg-surface border-b border-line flex flex-col gap-5">
+      <!-- Copy Stack -->
+      <div class="flex flex-col">
+        <h2 class="text-[21px] font-extrabold text-ink leading-tight">
+          Jua nani anakudai
+        </h2>
+        <span class="text-[13px] text-moss font-normal mt-0.5">
+          Know who owes you
+        </span>
+      </div>
+
+      <!-- Three short lines -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-1.5 h-1.5 rounded-full bg-tomato flex-shrink-0"></div>
+          <span class="text-[13.5px] font-semibold text-ink">Overdue first</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <div class="w-1.5 h-1.5 rounded-full bg-maize flex-shrink-0"></div>
+          <span class="text-[13.5px] font-semibold text-ink">Due dates on every deni</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <div class="w-1.5 h-1.5 rounded-full bg-sukuma flex-shrink-0"></div>
+          <span class="text-[13.5px] font-semibold text-ink">Payments update instantly</span>
+        </div>
+      </div>
+
+      <!-- Phone Screenshot of the Customer Debt List -->
+      <div class="mt-1 border border-line rounded-[8px] bg-chalk p-3 flex flex-col gap-2">
+        <div class="text-[11px] font-bold text-moss uppercase tracking-wider mb-1">
+          Orodha ya Deni (Debt List)
+        </div>
+
+        <!-- Debt Row 1: Overdue -->
+        <div class="bg-surface rounded-[8px] border border-line border-l-4 border-l-tomato p-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[13.5px] font-bold text-ink">Otieno Ouma</span>
+            <span class="text-[11px] font-semibold text-tomato">Deni limechelewa (Overdue 4d)</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[14.5px] font-extrabold text-ink num-tabular block">KES 1,200</span>
+            <span class="text-[10px] text-moss font-semibold">Kredit</span>
+          </div>
+        </div>
+
+        <!-- Debt Row 2: Due Soon -->
+        <div class="bg-surface rounded-[8px] border border-line border-l-4 border-l-maize p-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[13.5px] font-bold text-ink">Wanjiku</span>
+            <span class="text-[11px] font-semibold text-maize">Linalipwa Ijumaa (Due Friday)</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[14.5px] font-extrabold text-ink num-tabular block">KES 450</span>
+            <span class="text-[10px] text-moss font-semibold">Kredit</span>
+          </div>
+        </div>
+
+        <!-- Debt Row 3: Paid Cash -->
+        <div class="bg-surface rounded-[8px] border border-line border-l-4 border-l-sukuma p-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[13.5px] font-bold text-ink">Mama Mboga</span>
+            <span class="text-[11px] font-semibold text-sukuma">Imelipwa Kamili (Paid Cash)</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[14.5px] font-extrabold text-ink num-tabular block">KES 2,800</span>
+            <span class="text-[10px] text-moss font-semibold">Taslimu</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 6. MADE FOR GOODS AND SERVICES            -->
+    <!-- ========================================== -->
+    <section class="p-4 py-8 bg-chalk border-b border-line flex flex-col gap-4">
+      <div class="flex flex-col">
+        <h2 class="text-[21px] font-extrabold text-ink leading-tight">
+          Imejengwa kwa bidhaa na huduma
+        </h2>
+        <span class="text-[13px] text-moss font-normal mt-0.5">
+          Made for goods and services
+        </span>
+      </div>
+
+      <!-- Asymmetric Bento with exactly 4 photo cells -->
+      <div class="grid grid-cols-2 gap-3">
+        
+        <!-- Cell 1: Large (spans 2 columns) Mama Mboga -->
+        <div class="col-span-2 bg-surface rounded-[8px] border border-line overflow-hidden p-2.5 flex flex-col gap-2">
+          <div class="w-full h-[150px] rounded-[6px] overflow-hidden bg-chalk">
+            <img 
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfc0KGMJu9iCfVahDvE1i7_1shCU7uvOrN2wv1rSeujGR-_rcGzGnLvH2bWmoteoqJpXAK5l70mjFDwLztwiKR0yFL49ivjv6z_5JneYCjjyvYOZNSi9YKoOHtt3S_HeBL3YRV2PKVLI2nbS9VFkm5hZ_tOXhaFimYmFV7tX3hdYBXj2YOU-FKWyuT5DdAae2FdFeKzO7XPA08CMUki5kxu0LVkBOOQLyDqTJvOjuqFz0-8QW2urYzEkzvuE8eGxWe-nxUTJ01pt0" 
+              alt="Mama mboga selling produce" 
+              class="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+          </div>
+          <div class="flex flex-col px-1">
+            <span class="text-[13.5px] font-bold text-ink">Mama Mboga</span>
+            <span class="text-[12px] text-moss">Sell by kilo, fundo or tray</span>
+          </div>
+        </div>
+
+        <!-- Cell 2: Kiosk Shelf -->
+        <div class="col-span-1 bg-surface rounded-[8px] border border-line overflow-hidden p-2.5 flex flex-col gap-2">
+          <div class="w-full h-[105px] rounded-[6px] overflow-hidden bg-chalk">
+            <img 
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqY8d8YwLaqLf-Hnx8bCXjB9lonVOLJ1e2JEmbnkBzERtFHRUjbcc6J8qmqeMAf5QPuTDiiH0Yt0MIH-qIH62GcANInHM31iVa_kLgPV0sKXiUNq7FVNUW2PlQWwBH4OoTR-wSA6-a_isN_wVlHS9Ts6rjuWfeZxb1AJ3R0h9TUl4sjlXyvhQYiAh60UpYw6n4U2RfoD8crCyzO0D4G797F8PZOsoPLf3WDo9zdVvaMBZ7DFuDRLpFQZ2cr5BO9FfInSRmDPOKRj4" 
+              alt="Duka shop kiosk shelves with unga maize flour" 
+              class="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+          </div>
+          <div class="flex flex-col px-1">
+            <span class="text-[13px] font-bold text-ink">Duka Kiosk</span>
+            <span class="text-[11.5px] text-moss leading-snug">Track stock that runs low</span>
+          </div>
+        </div>
+
+        <!-- Cell 3: Boda Rider with Delivery Crate -->
+        <div class="col-span-1 bg-surface rounded-[8px] border border-line overflow-hidden p-2.5 flex flex-col gap-2">
+          <div class="w-full h-[105px] rounded-[6px] overflow-hidden bg-chalk">
+            <img 
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ8y09mf3wlkMPXhv_GIwK2YYO9rU8sqyZE5eBIJjfScz6hyz7hQ6p6eHDsMIx_oK--GSQBp7eEw5g0Q1ZqzM8m473Z_A2YUellS_EHB5bXm60vYIF_y6Yf7tIL6eaCPwoAtl8-uKDS5TRNtcW4o2L5pOi-9jOPLNagoZw4smtZEmYCCuXOAh9tHSyyDd8ebaDl6ozgltGAPgQeWeV-tcJ8usg2BCpJtanphuB2Nn_vRsuVh3eWPgDV-STq9s6SsEgUPNJ_25R7vw" 
+              alt="Kenyan boda boda rider with delivery crate" 
+              class="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+          </div>
+          <div class="flex flex-col px-1">
+            <span class="text-[13px] font-bold text-ink">Boda Boda</span>
+            <span class="text-[11.5px] text-moss leading-snug">Record trips and fuel</span>
+          </div>
+        </div>
+
+        <!-- Cell 4: Phone Fundi at Repair Bench (spans 2 columns) -->
+        <div class="col-span-2 bg-surface rounded-[8px] border border-line overflow-hidden p-2.5 flex flex-col gap-2">
+          <div class="w-full h-[135px] rounded-[6px] overflow-hidden bg-chalk">
+            <img 
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA-CqDYT6moA1kos6LizQz5YPiimp8JX7INcoCZGhM2OpK8DQxv3AqiUuWDlFbAAhmZhaN7Tx4DUqHNWWP6tIYzIZ6czYOXEPGYLWJ9iseWuUsb--n9BMN6FjJfc3R0DmhgpJeN5KF1qcF0qWxpYt67BtS0-49bh76S-s8Azx7OVGtOtTUiJHx8j6AtBGh33YlqKTchAreBdpWqjDL0kir12e99hQsSgH0gKsfJgcqCKgnlfA5z4Rx5Iesr_jHPVmRVNlVz1Hgmhw" 
+              alt="Kenyan phone repair fundi technician at workbench" 
+              class="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+          </div>
+          <div class="flex flex-col px-1">
+            <span class="text-[13.5px] font-bold text-ink">Fundi wa Simu</span>
+            <span class="text-[12px] text-moss">Repair jobs with deposits</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 7. START IN THREE ACTIONS                 -->
+    <!-- ========================================== -->
+    <section class="p-4 py-8 bg-surface border-b border-line flex flex-col gap-5">
+      <div class="flex flex-col">
+        <h2 class="text-[21px] font-extrabold text-ink leading-tight">
+          Anza kwa hatua tatu
+        </h2>
+        <span class="text-[13px] text-moss font-normal mt-0.5">
+          Start in three actions
+        </span>
+      </div>
+
+      <!-- Vertical list, large verbs, no step numbers -->
+      <div class="flex flex-col gap-3.5">
+        
+        <!-- Action 1 -->
+        <div class="p-4 rounded-[8px] border border-line bg-chalk flex flex-col">
+          <span class="text-[17px] font-extrabold text-ink tracking-tight">
+            Ingia <span class="text-[14px] font-semibold text-moss">/ Sign in</span>
+          </span>
+          <p class="text-[13px] text-ink font-medium mt-1 leading-snug">
+            Put in your Kenyan phone number and verify via instant SMS.
+          </p>
+        </div>
+
+        <!-- Action 2 -->
+        <div class="p-4 rounded-[8px] border border-line bg-chalk flex flex-col">
+          <span class="text-[17px] font-extrabold text-ink tracking-tight">
+            Weka PIN <span class="text-[14px] font-semibold text-moss">/ Set a PIN</span>
+          </span>
+          <p class="text-[13px] text-ink font-medium mt-1 leading-snug">
+            Choose a 4-digit secret code that only you know to protect your book.
+          </p>
+        </div>
+
+        <!-- Action 3 -->
+        <div class="p-4 rounded-[8px] border border-line bg-chalk flex flex-col">
+          <span class="text-[17px] font-extrabold text-ink tracking-tight">
+            Andika mauzo <span class="text-[14px] font-semibold text-moss">/ Record a sale</span>
+          </span>
+          <p class="text-[13px] text-ink font-medium mt-1 leading-snug">
+            Type the shillings amount and tap Save in two seconds flat.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 8. YOUR DATA IS YOURS                     -->
+    <!-- ========================================== -->
+    <section class="p-4 py-8 bg-chalk border-b border-line flex flex-col gap-4">
+      <div class="flex flex-col">
+        <h2 class="text-[21px] font-extrabold text-ink leading-tight">
+          Data yako ni yako
+        </h2>
+        <span class="text-[13px] text-moss font-normal mt-0.5">
+          Your data is yours
+        </span>
+      </div>
+
+      <!-- Text only grouped list -->
+      <div class="bg-surface rounded-[8px] border border-line divide-y divide-line overflow-hidden">
+        
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-sukuma flex-shrink-0"></div>
+          <span class="text-[13.5px] font-bold text-ink">The PIN never leaves your phone</span>
+        </div>
+
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-sukuma flex-shrink-0"></div>
+          <span class="text-[13.5px] font-bold text-ink">Backups are stored securely in the EU</span>
+        </div>
+
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-sukuma flex-shrink-0"></div>
+          <span class="text-[13.5px] font-bold text-ink">Ask us to delete it anytime</span>
+        </div>
+
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-sukuma flex-shrink-0"></div>
+          <span class="text-[13.5px] font-bold text-ink">No ads</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 9. FAQ ACCORDION                          -->
+    <!-- ========================================== -->
+    <section class="p-4 py-8 bg-surface border-b border-line flex flex-col gap-5">
+      <div class="flex flex-col">
+        <h2 class="text-[21px] font-extrabold text-ink leading-tight">
+          Maswali ya Mara kwa Mara
+        </h2>
+        <span class="text-[13px] text-moss font-normal mt-0.5">
+          Frequently Asked Questions
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-2.5">
+
+        <!-- FAQ 1 -->
+        <details class="group bg-chalk border border-line rounded-[8px] overflow-hidden" open>
+          <summary class="p-3.5 text-[14px] font-bold text-ink cursor-pointer flex items-center justify-between select-none">
+            <span>Is it free?</span>
+            <span class="text-moss text-[16px] font-normal transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-3.5 pb-3.5 text-[13px] text-moss leading-relaxed border-t border-line/60 pt-2 bg-surface">
+            Yes, Mazao is completely free to start for individual market traders, mama mbogas, and fundis.
+          </div>
+        </details>
+
+        <!-- FAQ 2 -->
+        <details class="group bg-chalk border border-line rounded-[8px] overflow-hidden">
+          <summary class="p-3.5 text-[14px] font-bold text-ink cursor-pointer flex items-center justify-between select-none">
+            <span>Does it work without internet?</span>
+            <span class="text-moss text-[16px] font-normal transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-3.5 pb-3.5 text-[13px] text-moss leading-relaxed border-t border-line/60 pt-2 bg-surface">
+            Yes. Every record saves directly inside your phone's memory. You don't need bundles or Wi-Fi to use it all day.
+          </div>
+        </details>
+
+        <!-- FAQ 3 -->
+        <details class="group bg-chalk border border-line rounded-[8px] overflow-hidden">
+          <summary class="p-3.5 text-[14px] font-bold text-ink cursor-pointer flex items-center justify-between select-none">
+            <span>What if I lose my phone?</span>
+            <span class="text-moss text-[16px] font-normal transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-3.5 pb-3.5 text-[13px] text-moss leading-relaxed border-t border-line/60 pt-2 bg-surface">
+            Whenever your phone catches internet, your records back up securely. Sign in on a new phone with your number and PIN to restore everything.
+          </div>
+        </details>
+
+        <!-- FAQ 4 -->
+        <details class="group bg-chalk border border-line rounded-[8px] overflow-hidden">
+          <summary class="p-3.5 text-[14px] font-bold text-ink cursor-pointer flex items-center justify-between select-none">
+            <span>Can I use it for a boda or repair business?</span>
+            <span class="text-moss text-[16px] font-normal transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-3.5 pb-3.5 text-[13px] text-moss leading-relaxed border-t border-line/60 pt-2 bg-surface">
+            Yes, Mazao supports service bookings, repair job deposits, fuel expenses, and trip counts just as smoothly as retail produce.
+          </div>
+        </details>
+
+        <!-- FAQ 5 -->
+        <details class="group bg-chalk border border-line rounded-[8px] overflow-hidden">
+          <summary class="p-3.5 text-[14px] font-bold text-ink cursor-pointer flex items-center justify-between select-none">
+            <span>Is it in Kiswahili?</span>
+            <span class="text-moss text-[16px] font-normal transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-3.5 pb-3.5 text-[13px] text-moss leading-relaxed border-t border-line/60 pt-2 bg-surface">
+            Titles now, full Kiswahili soon.
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 10. CLOSING BAND                          -->
+    <!-- ========================================== -->
+    <section class="p-6 py-10 bg-chalk border-b border-line flex flex-col items-center text-center gap-4">
+      <div class="flex flex-col items-center">
+        <h2 class="text-[24px] font-extrabold text-ink leading-tight">
+          Anza leo
+        </h2>
+        <span class="text-[14px] text-moss font-semibold mt-0.5">
+          Start today
+        </span>
+      </div>
+
+      <a href="#signup" class="w-full h-[52px] bg-sukuma active:bg-sukumaPressed text-white rounded-[8px] text-[15px] font-bold flex items-center justify-center transition-colors text-center">
+        Anza bure / Start free
+      </a>
+      
+      <span class="text-[11.5px] text-moss">
+        Haitaji kadi ya benki wala malipo ya mwanzo.
+      </span>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- 11. FOOTER                                -->
+  <!-- ========================================== -->
+  <footer class="p-4 py-8 bg-surface border-t border-line flex flex-col gap-5 text-left">
+    <div class="flex items-center justify-between">
+      <span class="text-2xl font-extrabold tracking-tight text-ink">Mazao</span>
+      <span class="text-[12px] font-medium text-moss">Gikomba • Nairobi</span>
+    </div>
+
+    <div class="flex flex-col gap-2 pt-2 border-t border-line/70">
+      <a href="#whatsapp" class="text-[13px] font-bold text-sukuma flex items-center gap-2">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+        </svg>
+        WhatsApp Support (+254 700 000 000)
+      </a>
+      <a href="#privacy" class="text-[12px] text-moss hover:text-ink">
+        Privacy notice
+      </a>
+    </div>
+
+    <div class="pt-3 border-t border-line/70 text-[11px] text-moss">
+      © 2026 Mazao. Haki zote zimehifadhiwa.
+    </div>
+  </footer>
+
+</body>
+</html>
