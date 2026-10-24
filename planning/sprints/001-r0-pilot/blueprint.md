@@ -80,7 +80,7 @@ server/        db.ts (Prisma 8 `postgres({ contract })` client, D-048) tenant.ts
 i18n/          en.ts en.shell.ts en.ledger.ts t.ts
 ui/            primitives (Button, Sheet, Chip, MoneyInput, PageTitle, …), shell/, ledger/
 prisma/          # contract.prisma + emitted contract.json/contract.d.ts (D-048)
-prisma.config.ts # Prisma 8 config (contract path; CLI connects with DIRECT_URL)
+prisma.config.ts # Prisma 8 config (contract path; CLI connects with DATABASE_URL_UNPOOLED)
 e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `dev`)
 ```
 
@@ -129,7 +129,7 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
 2. Prisma 8 is already initialised by A1a (D-048: empty `prisma/contract.prisma`, `prisma.config.ts`). Don't re-run init; A1b only adds the env template, CI and Vercel.
 3. `.env.example`:
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`;
-   - `DATABASE_URL` (Neon pooled, runtime), `DIRECT_URL` (Neon unpooled, migrations).
+   - `DATABASE_URL` (Neon pooled, runtime), `DATABASE_URL_UNPOOLED` (Neon direct, migrations), `NEON_BRANCH`, and the object-storage `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION` (all written by `neon env pull` / `neon deploy`).
 4. Link the Vercel project, region `fra1`, with the build command `pnpm build`. Preview deploys run per PR.
 
 **Verify:** CI is green on the PR, and the preview URL loads.

@@ -34,7 +34,7 @@ Stitch generated the first two screens, then stopped finishing jobs. Since about
 | 10.1 | Backup status component | not generated | not generated | Blocked |
 | 10.2 | Save anyway dialog | not generated | not generated | Blocked |
 
-Supporting photos that Stitch generated for the landing page: `da65c33e93a9411eb8c7df7eec4cf6e8` (mama mboga), `be6bc904b6ad4451af201c823a9aa13f` (notebook hands), `f1de9518c64a486f84ec8001cad09642` (Gikomba aisle), `bdf7eb1f6cd046bd8f4bad9203ce1c3f` (kiosk shelf), `a634ac4caa384b6b9433960b923f677a` (boda rider), `b143a01d738745419b75e40e01d27cdf` (phone fundi).
+Supporting photos that Stitch generated for the landing page are saved in the repo under `public/images/stitch/` (reference them in code as `/images/stitch/<file>`): `mama-mboga-stall.jpg`, `notebook-hands.jpg`, `gikomba-aisle.jpg`, `duka-shelf.jpg`, `boda-rider.jpg`, `phone-fundi-kiosk.jpg`. Stitch IDs, in the same order: `da65c33e93a9411eb8c7df7eec4cf6e8` (mama mboga), `be6bc904b6ad4451af201c823a9aa13f` (notebook hands), `f1de9518c64a486f84ec8001cad09642` (Gikomba aisle), `bdf7eb1f6cd046bd8f4bad9203ce1c3f` (kiosk shelf), `a634ac4caa384b6b9433960b923f677a` (boda rider), `b143a01d738745419b75e40e01d27cdf` (phone fundi).
 
 ## Approval
 

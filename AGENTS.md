@@ -42,7 +42,7 @@ pnpm e2e             # playwright
 pnpm build
 pnpm db:generate     # prisma contract emit (Prisma 8, D-048; also runs on postinstall)
 pnpm db:migrate:dev  # prisma migration plan --name <slug> (plans a migration from the contract diff)
-pnpm db:migrate      # prisma db migrate (applies planned migrations; uses DIRECT_URL)
+pnpm db:migrate      # prisma db migrate (applies planned migrations; uses DATABASE_URL_UNPOOLED)
 ```
 A PR is ready only when `lint`, `typecheck`, `test` and `build` pass and the step's Verify commands have been run.
 

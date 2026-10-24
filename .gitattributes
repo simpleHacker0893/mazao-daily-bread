@@ -1,3 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
 prisma/contract.json linguist-generated
 prisma/contract.d.ts linguist-generated
 prisma/ops.json linguist-generated
