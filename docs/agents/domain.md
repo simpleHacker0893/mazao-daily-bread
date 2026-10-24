@@ -5,7 +5,7 @@ How the engineering skills should read Mazao's domain documentation. The repo is
 ## Before exploring, read these
 - **`planning/DOMAIN.md`:** the glossary. Terms (deni, Faida Halisi, Mauzo, Kazi, Mtandao…), transaction types, the worked example.
 - **`planning/DECISIONS.md`:** the decision log. D-xxx entries act as ADRs; later superseding entries (D-037+) win over the ones they supersede.
-- Also useful: `planning/ROADMAP.md` (phases), `planning/specs/` (phase specs), and the current `planning/sprints/*/`.
+- Also useful: `planning/ROADMAP.md` (phases), `planning/sprints/phase-NN-*/spec.md` (phase specs), and the current `planning/sprints/*/`.
 
 Don't create `GLOSSARY.md` or `docs/adr/`. New terms go into `planning/DOMAIN.md`, and new decisions are appended to `planning/DECISIONS.md` as the next D-xxx (via the `architect` agent or `/domain-modeling`).
 
@@ -16,7 +16,6 @@ Don't create `GLOSSARY.md` or `docs/adr/`. New terms go into `planning/DOMAIN.md
 │   ├── DOMAIN.md        ← glossary
 │   ├── DECISIONS.md     ← decision log (ADR equivalent)
 │   ├── ROADMAP.md
-│   ├── specs/
 │   └── sprints/
 ├── app/  domain/  local/  sync/  server/  ui/   (no src/)
 ```

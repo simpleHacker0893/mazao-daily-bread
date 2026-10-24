@@ -127,7 +127,7 @@ These are house rules. Don't re-litigate them; to change one, propose a supersed
   - **Sources:** Stitch or image generation, or real Gikomba photos taken with written consent. No div-based fake screenshots.
   - **Format:** AVIF/WebP, ≤ 150 KB each. Only the auth and onboarding backgrounds are precached.
 - **D-046 (Owner, 2026-10-24):** **Phases.**
-  - The project is delivered in phases 0–11 (`planning/ROADMAP.md`). Each phase has a spec in `planning/specs/`, published as a GitHub issue labelled `ready-for-agent`, with a milestone per phase. Phases 0–4 form the R0 pilot.
+  - The project is delivered in phases 0–11 (`planning/ROADMAP.md`). Each phase has a spec in `planning/sprints/phase-NN-*/spec.md`, published as a GitHub issue labelled `ready-for-agent`, with a milestone per phase. Phases 0–4 form the R0 pilot.
   - Each phase with UI begins by generating its screens in Stitch from the prompt file through the Stitch MCP. This is automated in Phase 0.
 - **D-047 (Owner, 2026-10-24):** R0 adds a **"Leo / Today" daily report**:
   - every record of the day in time order, with totals that reconcile to Muhtasari;

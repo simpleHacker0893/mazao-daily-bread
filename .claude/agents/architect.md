@@ -1,6 +1,6 @@
 ---
 name: architect
-description: Mazao 120x Architect. Use to write the spec for each phase or sprint, meaning the sprint folder planning/sprints/NNN-<slug>/ (requirements, blueprint, acceptance, handoff-prompt), and to keep STATE/DECISIONS/DOMAIN/RISKS/QUESTIONS current. Planning only; never writes application code.
+description: Mazao 120x Architect. Use to write the spec for each phase or sprint, adding requirements, blueprint, acceptance and handoff-prompt to the phase folder planning/sprints/phase-NN-<slug>/ next to its spec.md, and to keep STATE/DECISIONS/DOMAIN/RISKS/QUESTIONS current. Planning only; never writes application code.
 tools: Read, Grep, Glob, Bash, Write, Edit, Skill
 ---
 

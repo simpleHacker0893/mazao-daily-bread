@@ -6,9 +6,9 @@ We use a 120x-style Architect/Builder loop: **the handoff is a folder, not a con
 
 ```
 planning/ROADMAP.md (phases 0-11)
-  └─ planning/specs/phase-NN-*.md   (to-spec format: problem, solution, user stories, decisions, tests, scope)
+  └─ planning/sprints/phase-NN-<slug>/spec.md   (to-spec format: problem, solution, user stories, decisions, tests, scope)
        └─ GitHub issue "Spec: Phase NN - <title>"  (label ready-for-agent, milestone "Phase NN")
-            └─ planning/sprints/NNN-<slug>/  (architect: requirements, blueprint, acceptance, handoff)
+            └─ planning/sprints/phase-NN-<slug>/ gains requirements, blueprint, acceptance, handoff (architect)
                  └─ one GitHub issue per blueprint step (scrum-architect), linked to the spec issue
                       └─ one branch + PR per step (frontend / backend / devops / qa) -> reviewer -> qa -> product-owner
 ```
@@ -16,11 +16,11 @@ planning/ROADMAP.md (phases 0-11)
 - **Spec issues** are the "what and why". Sprint folders are the "how". Step issues are the "who and when".
 - **Changing a spec:**
   1. Edit the Markdown file in a PR.
-  2. Update the issue body with `gh issue edit <n> --body-file planning/specs/phase-NN-*.md`.
+  2. Update the issue body with `gh issue edit <n> --body-file planning/sprints/phase-NN-<slug>/spec.md`.
   3. Record any new decision as a D-xxx.
 - **Publishing specs** (devops or scrum-architect), once per new phase:
   ```
-  gh issue create --title "Spec: Phase NN - <title>" --body-file planning/specs/phase-NN-<slug>.md     --label ready-for-agent --label spec --label phase-NN --milestone "Phase NN - <title>"
+  gh issue create --title "Spec: Phase NN - <title>" --body-file planning/sprints/phase-NN-<slug>/spec.md     --label ready-for-agent --label spec --label phase-NN --milestone "Phase NN - <title>"
   ```
 
 ## Automated design generation (Stitch MCP, D-046)
@@ -35,7 +35,7 @@ For each phase with UI, before building:
 ## The loop (per sprint)
 
 ```
-1. PLAN      architect agent → planning/sprints/NNN-<slug>/{requirements,blueprint,acceptance,handoff-prompt}.md (+ reviewer adversarial pass)
+1. PLAN      architect agent → planning/sprints/phase-NN-<slug>/{requirements,blueprint,acceptance,handoff-prompt}.md, next to spec.md (+ reviewer adversarial pass)
 2. DESIGN    Stitch prompts → Stitch screens → docs/design/<release>/ screenshots
 3. SPLIT     scrum-architect → one task/issue per step, assigned to frontend / backend / devops / qa
 4. BUILD     specialist agent per step: branch → tests first → code → Verify → PR
@@ -77,7 +77,7 @@ For each phase with UI, before building:
 - Playwright runs locally for each UI step, and in full at sprint close (A6-style integration step).
 
 ### 6. Review
-- "Use the reviewer agent on PR #N", then "use the qa agent to verify PR #N", then "use the product-owner agent to accept PR #N against planning/sprints/NNN/acceptance.md".
+- "Use the reviewer agent on PR #N", then "use the qa agent to verify PR #N", then "use the product-owner agent to accept PR #N against planning/sprints/phase-NN-<slug>/acceptance.md".
 - It reads the diff and runs the read-only checks (`git diff`, tests). Its verdict per AC is **met / not met / not evidenced**.
 - It never fixes code. Gaps become PR review comments, or items in the next sprint.
 
