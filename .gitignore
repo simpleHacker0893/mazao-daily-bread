@@ -1,0 +1,23 @@
+# Dependencies and builds
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+
+# Env and secrets
+.env
+.env*.local
+.env.local
+
+# Local-only Claude settings
+.claude/settings.local.json
+
+# Impeccable engine binaries (downloaded on first run)
+.agents/skills/impeccable/scripts/bin/
+.claude/skills/impeccable/scripts/bin/
+
+# OS
+.DS_Store
+Thumbs.db
