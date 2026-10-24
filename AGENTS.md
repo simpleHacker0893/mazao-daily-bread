@@ -25,7 +25,7 @@ Mazao is an offline-first PWA bookkeeping app for small Kenyan merchants who sel
 - **Tenancy:** every business-owned row has `businessId` and `createdBy`. Server routes call `requireMember()` and reject any row from another business.
 - **Pure numbers:** all maths lives in `domain` as pure functions with tests. Hooks and components never calculate money.
 - **AI (R4+):** nothing AI-produced is saved without the Review Card and the exact button `[ ✅ Confirm & Save Record ]`.
-- **Strings:** every UI string comes from `i18n`. Navigation names are Kiswahili (D-004). Market words (deni, Faida Halisi, ushuru, kilo, gunia…) are never translated.
+- **Strings:** every UI string comes from `i18n` via `t(key, locale)`. English is the default; the merchant can switch to Kiswahili (D-049). Add every new key to both `en.*` and `sw.*` halves.
 - **Next.js:** latest version, App Router, **no `src/`** (code folders at the repo root), React Compiler on. Don't hand-add `useMemo`/`useCallback`/`memo`, and keep render pure. Build with `next build --webpack` (Serwist).
 - **Phones:** the target is a 3 GB RAM Android phone running Chrome. Keep bundles small and lazy-load heavy screens; tap targets are ≥ 48 px.
 - **Privacy:** never log record contents, phone numbers or PIN material. The PIN never leaves the device.

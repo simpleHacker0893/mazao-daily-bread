@@ -37,17 +37,17 @@ Every PR is reviewed by the `reviewer` agent, and the `qa` agent runs its Verify
 - **Dev A:**
   - `app/(shell)/*`, `app/(app)/layout.tsx` (AppShell + LockGuard), `app/(app)/mipangilio`;
   - `app/api/*`, `auth/*`, `sync/*`, `server/*`, `ui/shell/*` (nav, SyncChip, update toast);
-  - `proxy.ts`, `prisma/*`, `public/*`, config files, `i18n/en.shell.ts`.
+  - `proxy.ts`, `prisma/*`, `public/*`, config files, `i18n/en.shell.ts`, `i18n/sw.shell.ts`.
 - **Dev B:**
   - `domain/*`, `local/*` (including `nextRouteAfterPin()`);
   - every other `app/(app)/*` page;
   - `ui/*` primitives and `ui/ledger/*`;
-  - `i18n/en.ledger.ts`.
+  - `i18n/en.ledger.ts`, `i18n/sw.ledger.ts`.
 - **Shared contracts, created by A1a and changed only with both devs agreeing in the PR:**
   - `domain/types.ts` and `domain/schemas.ts`, frozen after B1;
   - `auth/session.ts` (`useSession()` shape);
   - `local/device-db.ts` (schema);
-  - `i18n/en.ts` (merges the two halves).
+  - `i18n/en.ts`, `i18n/sw.ts` (each merges its two halves) and `i18n/t.ts` (`t(key, locale)`, English default, D-049).
 
 ## Target structure
 ```
@@ -76,11 +76,11 @@ domain/        types.ts schemas.ts money.ts ledger.ts summary.ts grill.ts dates.
 local/         device-db.ts business-db.ts commit.ts queries.ts routing.ts (nextRouteAfterPin)
 sync/          engine.ts wire.ts
 auth/          pin.ts session.ts
-server/        db.ts (PrismaClient singleton + PrismaNeon adapter) tenant.ts
+server/        db.ts (Prisma 8 `postgres({ contract })` client, D-048) tenant.ts
 i18n/          en.ts en.shell.ts en.ledger.ts t.ts
 ui/            primitives (Button, Sheet, Chip, MoneyInput, PageTitle, …), shell/, ledger/
-prisma/          # schema.prisma + migrations/
-prisma.config.ts # Prisma config (schema path, migrate datasource = DIRECT_URL)
+prisma/          # contract.prisma + emitted contract.json/contract.d.ts (D-048)
+prisma.config.ts # Prisma 8 config (contract path; CLI connects with DIRECT_URL)
 e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `dev`)
 ```
 
@@ -105,13 +105,13 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
    - Confirm that `next.config.ts` has `reactCompiler: true` and that `babel-plugin-react-compiler` is installed (it's needed with the webpack build). There must be **no** `eslint.config.*` or `.eslintrc*`: Biome is the only linter and formatter (D-043).
 3. Pin pnpm: `corepack use pnpm@latest` (this writes `packageManager`). Commit `pnpm-lock.yaml` and never a `package-lock.json`.
 4. Install the dependencies:
-   - `pnpm add dexie dexie-react-hooks zod @clerk/nextjs @prisma/client @prisma/adapter-neon @serwist/next serwist`
-   - `pnpm add -D prisma vitest @vitest/coverage-v8 fake-indexeddb @testing-library/react @testing-library/jest-dom jsdom @playwright/test`
+   - `pnpm add dexie dexie-react-hooks zod @clerk/nextjs @prisma/orm-postgres @serwist/next serwist` (D-048: Prisma 8, no `@prisma/client` or adapter)
+   - `pnpm add -D prisma dotenv vitest @vitest/coverage-v8 fake-indexeddb @testing-library/react @testing-library/jest-dom jsdom @playwright/test`
 5. Scripts:
    - `dev`, `start`, `lint` (`biome check .`), `format` (`biome format --write .`), `typecheck` (`tsc --noEmit`), `test` (`vitest run`), `test:watch`, `e2e` (`playwright test`);
    - **`build` is `next build --webpack`**, because Serwist doesn't support Turbopack. The same command goes into Vercel's build settings.
-   - `postinstall` runs `prisma generate`.
-   - `db:generate` (`prisma generate`), `db:migrate:dev` (`prisma migrate dev`), `db:migrate` (`prisma migrate deploy`).
+   - `postinstall` runs `prisma contract emit` (D-048).
+   - `db:generate` (`prisma contract emit`), `db:migrate:dev` (`prisma migration plan`, pass `--name <slug>`), `db:migrate` (`prisma db migrate`).
 6. `tsconfig` strict, plus `noUncheckedIndexedAccess: true`.
 7. **Contract stubs** (typed and minimal, so both lanes code against them):
    - `auth/session.ts`: `useSession(): { profileId; businessId; clerkUserId; email } | null`, plus `setSession` / `clearSession`.
@@ -126,7 +126,7 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
 
 ## A1b: CI + Vercel + Prisma init (Dev A / devops)
 1. `.github/workflows/ci.yml` on PRs and `main`: `pnpm/action-setup` → `actions/setup-node` (`cache: pnpm`) → `pnpm install --frozen-lockfile` → `pnpm exec biome ci .` → typecheck → test → build.
-2. `pnpm prisma init`. Use the **latest** Prisma and follow its current docs for the generator block and `prisma.config.ts`; don't copy older-version snippets.
+2. Prisma 8 is already initialised by A1a (D-048: empty `prisma/contract.prisma`, `prisma.config.ts`). Don't re-run init; A1b only adds the env template, CI and Vercel.
 3. `.env.example`:
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`;
    - `DATABASE_URL` (Neon pooled, runtime), `DIRECT_URL` (Neon unpooled, migrations).
@@ -276,6 +276,8 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
 4. Sign-in page:
    - a privacy-notice card (what we store; stored in the EU; how to delete) with an "I agree" checkbox; Clerk `<SignIn />` is enabled only after it's ticked;
    - after sign-in: bootstrap, then restore (A5) if `hasData`, then `/set-pin`.
+> **D-048 supersedes the Prisma 7 specifics in tasks 5–8** (`schema.prisma`, `prisma migrate`, `PrismaClient` + `PrismaNeon`, `$transaction`). Implement the same models, constraints and transactional bootstrap with Prisma 8 (`prisma/contract.prisma`, `migration plan` + `db migrate`, `server/db.ts` via `postgres({ contract })`), following the `prisma-8` agent skill.
+
 5. Prisma models in `prisma/schema.prisma`:
    - snake_case through `@@map`/`@map`; `@db.Uuid` ids with **no** `@default` on synced tables; `@db.Decimal(14,2)` money; `@db.Decimal(14,3)` quantities.
    - CHECK constraints go in the migration SQL (`prisma migrate dev --create-only`, then edit).

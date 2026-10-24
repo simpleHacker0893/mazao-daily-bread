@@ -2,6 +2,12 @@
 import { ledger } from "./en.ledger";
 import { shell } from "./en.shell";
 
-export const en = { ...shell, ...ledger } as const;
+// Each half owns its prefix, so a spread can never silently overwrite the other half's key.
+type HasOnlyPrefix<T, P extends string> =
+  Exclude<keyof T, `${P}.${string}`> extends never ? T : never;
+const shellKeys: HasOnlyPrefix<typeof shell, "shell"> = shell;
+const ledgerKeys: HasOnlyPrefix<typeof ledger, "ledger"> = ledger;
+
+export const en = { ...shellKeys, ...ledgerKeys } as const;
 
 export type MessageKey = keyof typeof en;

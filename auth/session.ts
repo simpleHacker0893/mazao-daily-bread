@@ -27,14 +27,18 @@ function getServerSnapshot(): Session {
   return null;
 }
 
+function notify(): void {
+  for (const listener of listeners) listener();
+}
+
 export function setSession(session: NonNullable<Session>): void {
   current = session;
-  for (const listener of listeners) listener();
+  notify();
 }
 
 export function clearSession(): void {
   current = null;
-  for (const listener of listeners) listener();
+  notify();
 }
 
 export function useSession(): Session {

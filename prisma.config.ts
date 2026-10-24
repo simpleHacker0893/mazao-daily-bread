@@ -2,7 +2,8 @@ import "dotenv/config";
 import { defineConfig as ormConfig } from "@prisma/orm-postgres/config";
 import { definePrismaConfig } from "prisma/config";
 
-// The CLI (migrations) uses the direct, unpooled Neon URL; the app runtime uses DATABASE_URL (D-037).
+// D-048: the CLI (migrations) uses the direct, unpooled Neon URL; the app runtime uses DATABASE_URL.
+// Falls back to "" so the offline `contract emit` on postinstall works before any .env exists.
 export default definePrismaConfig({
   orm: ormConfig({
     contract: "./prisma/contract.prisma",
