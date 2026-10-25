@@ -17,3 +17,6 @@ Ranked by how much each one blocks.
 - **Q-005:** When should phone-number (SMS OTP) sign-in replace or join email? What does Clerk charge for +254 SMS?
 - **Q-006:** The Kiswahili screen titles invented in `docs/design/stitch-prompts.md` need checking by a native speaker: Karibu Mazao, Weka PIN, Tuanze, Wasifu wa Biashara, Leta Daftari Lako, Mauzo Mapya, Gharama Mpya, Manunuzi Mapya, Andika Haraka, Sema.
 - **Q-007:** The loan workaround is unrecorded, so cash numbers can drift for merchants who borrow. Measure how much this hurts at the week-4 debrief, then decide on R-later Mikopo.
+- **Q-019:** What does "pending supplies" mean to merchants (D-053)? Goods ordered from a supplier but not yet received, supplies taken on credit and not yet paid, or something else?
+  - _Interim for the demo:_ goods ordered from a supplier but not yet received, showing the supplier, the items, the expected day and any amount still owed.
+  - _Owner:_ product owner, by asking the pilot merchants in week 1.
