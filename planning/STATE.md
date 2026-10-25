@@ -42,6 +42,17 @@ _Rolling snapshot. Edit in place; never append a log._
 - **A1b (#16):** CI workflow, Vercel project in `fra1` with preview deploys.
 - **A2 (#17, #18), imagery (#19, #20), landing (#22).** The specialist agents for #16, #17 and #19 were stopped with the scrum-architect before opening PRs. Their worktrees under `.claude/worktrees/` may hold partial work.
 
+**Design build plan (branch `docs/design-build-prompts`, not merged yet):**
+- `docs/design/build-prompts.md`: step-by-step prompts for the demo, dashboards, landing page and sign-in.
+- **Step 0 done:**
+  - D-051 public demo mode (`/demo`, mock data, saves nothing);
+  - D-052 collapsible sidebar from 1024 px (bottom nav below);
+  - D-053 dashboards built ahead on mock data in the Phase 4 contract shape (Suppliers and Analysis are demo-only);
+  - D-054 interim projection method;
+  - Q-019 "pending supplies";
+  - `PRODUCT.md` written with impeccable init. Positioning: "Know your real profit". Free during the pilot. The store owner is the only user for now.
+- **Next:** step 1 (shape the screens, no code).
+
 ## Known issues
 - **The Tailwind scan must skip `.claude/` and `.agents/`** (`@source not` in `app/globals.css`). The agent worktrees there otherwise crash the webpack build with `WasmHash ... reading 'length'`. Vitest and tsc exclude them too.
 - **`pg` prints an SSL-mode notice** (`sslmode=require` is treated as `verify-full`). This is harmless.
