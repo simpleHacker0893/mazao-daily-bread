@@ -29,7 +29,7 @@ Dev B's full Sunday schedule across Phases 2–4, and the R-001 schedule risk it
 ## Global Constraints
 
 - Package manager **pnpm only**. Latest Next.js App Router, **no `src/`**, React Compiler on; no hand-written `useMemo`/`useCallback`/`memo`; render stays pure. Build is `next build --webpack` (D-042). Biome only. TypeScript strict + `noUncheckedIndexedAccess`.
-- **Offline first.** `/`, `/leo` and `/mipangilio` are client pages that read only from Dexie, with no server data fetching and no dynamic segments (D-041). `/leo` is already in the A2 placeholder routes and precache list (#17, #18), so the service worker needs no change in this phase. If A2 shipped without `/leo`, adding it belongs to Dev A's lane (`app/sw.ts`).
+- **Offline first.** `/`, `/today` and `/settings` are client pages that read only from Dexie, with no server data fetching and no dynamic segments (D-041). `/today` is already in the A2 placeholder routes and precache list (#17, #18), so the service worker needs no change in this phase. If A2 shipped without `/today`, adding it belongs to Dev A's lane (`app/sw.ts`).
 - **One source of numbers.** Muhtasari, Leo and the shared text all come from `daySummary` through `dayReport` (Task 1). `dayReport.totals` **is** `daySummary(...)`, never a second calculation. Components and hooks never calculate money, and never negate a balance to show credit.
 - **Day:** the Nairobi business day by `occurredAt` (`nairobiDayRange(todayInNairobi())`). `useToday()` rolls over at midnight (B2).
 - **Money:** integer cents (D-013), "KES 1,250" through `formatKES`. Payments, opening balances and stock adjustments are never sales (D-011, D-014).
@@ -42,8 +42,8 @@ Dev B's full Sunday schedule across Phases 2–4, and the R-001 schedule risk it
 
   If A1a merges **without** D-048, Task 6 follows D-037 as on `main` today (`@prisma/client` with `@prisma/adapter-neon`, `prisma migrate deploy`), and the scrum-architect updates Task 6's checks before it starts.
 - **File ownership (R-011):**
-  - **Dev B:** `domain/*`, `local/*` (except the A1a contract stubs), `ui/*`, `ui/ledger/*`, `app/(app)/page.tsx`, `app/(app)/leo/*`, the ledger half of the `en` and `sw` dictionaries.
-  - **Dev A:** `app/(app)/mipangilio/*`, `sync/*`, `auth/*`, `ui/shell/*`, `app/sw.ts`, `prisma/*`, config (including `package.json` and `pnpm-lock.yaml`), the shell half of the `en` and `sw` dictionaries.
+  - **Dev B:** `domain/*`, `local/*` (except the A1a contract stubs), `ui/*`, `ui/ledger/*`, `app/(app)/page.tsx`, `app/(app)/today/*`, the ledger half of the `en` and `sw` dictionaries.
+  - **Dev A:** `app/(app)/settings/*`, `sync/*`, `auth/*`, `ui/shell/*`, `app/sw.ts`, `prisma/*`, config (including `package.json` and `pnpm-lock.yaml`), the shell half of the `en` and `sw` dictionaries.
   - **qa:** `e2e/*` specs it creates.
   - **developer:** `docs/pilot/*`.
 - **Language (D-049, Owner 2026-10-24; supersedes the naming parts of D-004 and D-040; recorded on the unmerged `feat/a1a-skeleton`, assumed to merge with A1a).**
@@ -136,21 +136,21 @@ Order at 360×800 (spec §Implementation Decisions, Muhtasari screen):
 4. **Money in today:** one bar split Cash (Ink), M-Pesa (Slate) and Other (colour per **OQ-4.4**), widths from `moneyIn`, with labels and amounts below. "Deni given today" is a separate Maize line, never a bar segment.
 5. **Who owes you:**
    - the total and the number of customers;
-   - the top 5 rows from `deni.rows`, each with a left status bar plus text ("2 days overdue", "due tomorrow"), opening `/deni/customer?id=…`;
+   - the top 5 rows from `deni.rows`, each with a left status bar plus text ("2 days overdue", "due tomorrow"), opening `/debts/customer?id=…`;
    - "See all deni".
 6. Supplier deni brought forward, as one line, shown only when it isn't zero.
 7. Low stock rows, such as "Mayai: 1 tray left", shown only when there are any.
-8. The "Today" link row: "See everything recorded today (n)" → `/leo`.
+8. The "Today" link row: "See everything recorded today (n)" → `/today`.
 9. Quick actions:
-   - a full-width primary **New sale** (`/mauzo/new`);
-   - outlined **New expense** (`/gharama/new`) and **Record payment** side by side. Record payment opens P3-2's `RecordPaymentSheet` without a `customerId`.
+   - a full-width primary **New sale** (`/sales/new`);
+   - outlined **New expense** (`/expenses/new`) and **Record payment** side by side. Record payment opens P3-2's `RecordPaymentSheet` without a `customerId`.
 10. Day-1 empty state: "No sales yet today. Record your first sale." with New sale. One optional empty-state photo, only if a manifest entry exists (#19). Never put a photo behind figures.
 
 ### Acceptance criteria
 
 - [ ] e2e (built app, offline after unlock): after the worked example, the hero shows KES 210 and the statement shows 350, 90 and 50. Money in shows Cash 150 and M-Pesa 200 (AC-03 Muhtasari part).
-- [ ] e2e: after an opening balance for Otieno of 500, Who owes you shows 500, **`/deni` shows Otieno with 500**, and the hero and Sales show 0 (AC-05, both parts).
-- [ ] e2e, offline: saving a sale on `/mauzo/new` and going back to `/` shows the new hero figure with no reload (AC-16 "Muhtasari updates instantly").
+- [ ] e2e: after an opening balance for Otieno of 500, Who owes you shows 500, **`/debts` shows Otieno with 500**, and the hero and Sales show 0 (AC-05, both parts).
+- [ ] e2e, offline: saving a sale on `/sales/new` and going back to `/` shows the new hero figure with no reload (AC-16 "Muhtasari updates instantly").
 - [ ] e2e: a negative Faida Halisi (expense only) shows a leading minus in Ink, not Tomato.
 - [ ] e2e: a fake clock across midnight EAT rolls the figures to the new day without a reload.
 - [ ] e2e: the page shows the English title "Overview" and the English section labels by default; "Faida Halisi" shows in both locales. With `meta.locale = 'sw'` (seeded until Task 4 ships the control), the title, section labels and date line show their `sw` dictionary values with no reload (AC-21 part, as proposed to be reworded).
@@ -177,7 +177,7 @@ At closing time, the merchant opens "Today" from Muhtasari and runs her finger d
 - who bought, who paid and who now owes;
 - one tap sends a plain-text summary to WhatsApp, even with no signal.
 
-1. `/leo` (client page, offline):
+1. `/today` (client page, offline):
    - the page title from its message key (English "Today" by default, `sw` "Leo" when switched) and the date;
    - a totals block with the same figures as Muhtasari;
    - **Share today's summary** (Cut 3a).
@@ -186,11 +186,11 @@ At closing time, the merchant opens "Today" from Muhtasari and runs her finger d
    - voided records are struck through, marked "Voided" and left out of the totals;
    - a void of an earlier day's record shows "Changed <day>'s totals, not today's" (AC-27);
    - a "Brought forward" group sits at the end and is not counted;
-   - **ASSUMPTION (OQ-4.10):** tapping **any** entry (sale, expense, payment, opening balance, void) opens P3-2's `TxnDetailSheet` for its `txnId`, where Void is offered when `canVoid`. This task owns that tap. It is the only expense-void path once Cut 4 removes `/gharama`.
+   - **ASSUMPTION (OQ-4.10):** tapping **any** entry (sale, expense, payment, opening balance, void) opens P3-2's `TxnDetailSheet` for its `txnId`, where Void is offered when `canVoid`. This task owns that tap. It is the only expense-void path once Cut 4 removes `/expenses`.
 3. **Customers today** (Cut 3a):
    - one row per customer, showing bought, paid, and the status from `standing`: "owes KES n", "owes nothing now", or "in credit KES n" (n = `standing.amount`; no negation in the component);
    - one "Walk-in" row for sales with no customer;
-   - each named row opens `/deni/customer?id=…`.
+   - each named row opens `/debts/customer?id=…`.
 4. **Share** (Cut 3a), in `ui/ledger/share-summary.ts`:
    - `shareSummary(text)` calls `navigator.share({ text })` when it exists; an `AbortError` does nothing.
    - Otherwise, or on any other error, it falls back to `navigator.clipboard.writeText` with the snackbar "Copied. Paste it in WhatsApp."
@@ -201,16 +201,16 @@ At closing time, the merchant opens "Today" from Muhtasari and runs her finger d
 
 ### Acceptance criteria
 
-- [ ] e2e (built app, offline after unlock): after the worked example, `/leo` lists 3 entries in time order and shows Sales 350, COGS 90, Expenses 50, Faida Halisi 210, Cash 150 and M-Pesa 200, the same numbers `/` shows (AC-24).
+- [ ] e2e (built app, offline after unlock): after the worked example, `/today` lists 3 entries in time order and shows Sales 350, COGS 90, Expenses 50, Faida Halisi 210, Cash 150 and M-Pesa 200, the same numbers `/` shows (AC-24).
 - [ ] e2e: deni scenario → Wanjiku's row shows bought 300, paid 250, owes 50. Void the payment → paid 100, owes 200, the payment entry struck through as "Voided", and the totals still equal Muhtasari (AC-25). If Cut 3a is applied, the customer-row part is waived **only if OQ-4.9 is answered yes**; otherwise Cut 3a must keep the Customers today section.
 - [ ] e2e: a customer who owed 50 and pays 150 today shows "in credit KES 100".
 - [ ] e2e: an opening balance and opening stock entered today appear under "Brought forward", and Sales and Faida Halisi stay 0 (AC-26).
 - [ ] e2e: with a fake clock, a sale dated yesterday and voided today is listed today with the "changed yesterday's totals" note, and today's totals are unchanged (AC-27).
-- [ ] e2e: tapping today's ushuru expense in the list opens `TxnDetailSheet`; voiding it strikes the entry through and Expenses and Faida Halisi update on both `/leo` and `/`. (Required before Cut 4 may be applied.)
+- [ ] e2e: tapping today's ushuru expense in the list opens `TxnDetailSheet`; voiding it strikes the entry through and Expenses and Faida Halisi update on both `/today` and `/`. (Required before Cut 4 may be applied.)
 - [ ] e2e: with `navigator.share` stubbed, the shared text contains "Faida Halisi" and no customer name. With it removed, the clipboard holds the text and "Copied" shows. A stubbed `AbortError` shows nothing (AC-28 browser part; the real phone check is in P4-8).
-- [ ] e2e, cold offline: `/leo` opens directly with the network off and shows the English title "Today"; with `meta.locale = 'sw'` it shows the `sw` title (AC-29, as proposed to be reworded).
-- [ ] An impeccable critique of `/leo` at 360×800 reports no blocking issue. Output pasted in the PR (AC-30, Leo part).
-- [ ] lint, typecheck, test and build pass. `pnpm build && pnpm exec playwright test e2e/leo.spec.ts` output is pasted in the PR.
+- [ ] e2e, cold offline: `/today` opens directly with the network off and shows the English title "Today"; with `meta.locale = 'sw'` it shows the `sw` title (AC-29, as proposed to be reworded).
+- [ ] An impeccable critique of `/today` at 360×800 reports no blocking issue. Output pasted in the PR (AC-30, Leo part).
+- [ ] lint, typecheck, test and build pass. `pnpm build && pnpm exec playwright test e2e/today.spec.ts` output is pasted in the PR.
 
 ### Blocked by
 
@@ -222,7 +222,7 @@ At closing time, the merchant opens "Today" from Muhtasari and runs her finger d
 
 ### Parent
 
-#5 (Phase 4). Blueprint **A6 task 1** (RQ-13, plus the D-049 language switch), branch `feat/a6-mipangilio`. Agent `frontend`, default model. **Dev A lane** (`app/(app)/mipangilio/*`, the shell half of the `en` and `sw` dictionaries).
+#5 (Phase 4). Blueprint **A6 task 1** (RQ-13, plus the D-049 language switch), branch `feat/a6-mipangilio`. Agent `frontend`, default model. **Dev A lane** (`app/(app)/settings/*`, the shell half of the `en` and `sw` dictionaries).
 
 ### What to build
 
@@ -318,7 +318,7 @@ The hand-calculated sheet (the table above with the arithmetic and the queue cou
 ### Acceptance criteria
 
 - [ ] The spec passes against the built app, offline after unlock, and asserts every row of the table and every final value, including the low-stock section and `Not backed up (18)` (AC-33).
-- [ ] Muhtasari and `/leo` show identical totals (AC-24 pattern on a full day).
+- [ ] Muhtasari and `/today` show identical totals (AC-24 pattern on a full day).
 - [ ] The test runs in CI's Playwright job, or is listed in the PR as run locally if CI has no browser job yet.
 - [ ] lint, typecheck, test and build pass.
 
@@ -453,10 +453,10 @@ The scrum-architect applies these at the Sun 18:00 checkpoint, strictly in order
 - **Cut 1: restore-by-pull** (Phase 1). Task 8 records **AC-19 as waived**.
 - **Cut 2: onboarding reduced to name, type and items** (Phase 2). Task 5 seeds the payment methods and the due-rule default through the fixture. AC-15's time target still applies.
 - **Cut 3: the `PRICE_VARIANCE` and `POSSIBLE_DUPLICATE` rules** (Phase 3). Task 5 drops the step-2b and step-6 warning assertions. Waives no AC.
-- **Cut 3a: the per-customer section and Share on `/leo`** (Task 3 items 3 and 4; Task 1 keeps `customers` and `formatDaySummaryText`, because they are cheap and already tested). The chronological list and the totals stay. **Waives AC-28.** It waives the customer-row part of AC-25 **only if OQ-4.9 is answered yes**; until then, applying Cut 3a means keeping "Customers today" and cutting only Share. Neither waiver is in acceptance.md's Waivers list yet (proposed edit below).
+- **Cut 3a: the per-customer section and Share on `/today`** (Task 3 items 3 and 4; Task 1 keeps `customers` and `formatDaySummaryText`, because they are cheap and already tested). The chronological list and the totals stay. **Waives AC-28.** It waives the customer-row part of AC-25 **only if OQ-4.9 is answered yes**; until then, applying Cut 3a means keeping "Customers today" and cutting only Share. Neither waiver is in acceptance.md's Waivers list yet (proposed edit below).
 - **Cut 4: the Gharama list screen** (Phase 3). Expense void then lives only in Leo (Task 3's entry tap → `TxnDetailSheet`). **Valid only once Task 3 has merged with the expense-void e2e passing**; until then Cut 4 can't be applied. Waives no AC.
 
-**Never cut:** offline save; PIN lock; push backup; **correct Faida Halisi and deni** (Task 1, Task 2, Task 5); the privacy notice; void (on sales, payments and opening balances in P3-2, on expenses in Task 3 or `/gharama`). The blueprint's "bilingual titles" item is superseded by D-049; **proposed replacement, needs owner confirmation:** "all copy through `t()` in both `en` and `sw`, English by default, with the language switch in Settings" (Tasks 2–4). The deploy (Task 6) and the acceptance run (Task 8) can't be cut either, because the pilot can't run without them.
+**Never cut:** offline save; PIN lock; push backup; **correct Faida Halisi and deni** (Task 1, Task 2, Task 5); the privacy notice; void (on sales, payments and opening balances in P3-2, on expenses in Task 3 or `/expenses`). The blueprint's "bilingual titles" item is superseded by D-049; **proposed replacement, needs owner confirmation:** "all copy through `t()` in both `en` and `sw`, English by default, with the language switch in Settings" (Tasks 2–4). The deploy (Task 6) and the acceptance run (Task 8) can't be cut either, because the pilot can't run without them.
 
 ## Open questions (owner or product-owner to answer before the named task starts)
 
@@ -479,7 +479,7 @@ The language questions common to both phases are **OQ-3.12** (market words in th
 
 - **Blueprint B4:**
   - add `dayReport` (with `customers[].standing`), `formatDaySummaryText`, `moneyInShares`, `supplierDeniTotal`, `formatNairobiDate(day, locale)` and `useDayReport`/`useDashboard`/`useBusinessHeader` (Task 1, strongest model);
-  - note that `/leo` is already in the A2 precache list;
+  - note that `/today` is already in the A2 precache list;
   - Leo owns the entry tap into `TxnDetailSheet`.
 - **Blueprint A6:**
   - replace `prisma migrate deploy` with `prisma db migrate` (D-048) once D-048 is on `main`, and add the check that the emitted contract is committed;

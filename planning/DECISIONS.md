@@ -149,3 +149,8 @@ These are house rules. Don't re-litigate them; to change one, propose a supersed
   - i18n contract: `i18n/en.*.ts` and `i18n/sw.*.ts`, each split into shell (Dev A) and ledger (Dev B) halves; the Kiswahili halves are typed against the English keys, so a missing translation fails typecheck. `t(key, locale = "en")`.
   - Open (owner to confirm): whether market words from D-005 (deni, Faida Halisi, ushuru…) stay untranslated in the English UI. Until confirmed, the English UI uses plain English (Debts, Net profit) and the Kiswahili UI uses the market words.
   - Still in force from D-040: the mobile layout (bottom nav) at every width, with no sidebar.
+- **D-050 (Owner, 2026-10-25, supersedes the route names in D-041 and the open market-words question in D-049 for R0):** **Routes, route folders and navigation are English; Kiswahili translation comes in a later phase.**
+  - Routes: Overview `/`, `/sales`, `/sales/new`, `/expenses`, `/expenses/new`, `/debts`, `/debts/customer?id=<uuid>`, `/items`, `/settings`, `/today`, plus `/onboarding`, `/onboarding/review`, `/notebook`, `/lock`, `/set-pin`, `/welcome`. The folders under `app/` use the same names.
+  - Bottom nav: Overview, Sales, Debts, Expenses, More (drawer: Items, Settings). One English label per item and one English page title; no Kiswahili caption.
+  - D-041's rule still holds with the new path: no dynamic segments, the customer id travels in the query string.
+  - Kiswahili strings stay in `i18n/sw.*`, typed against the English keys, so the later translation phase only adds the Settings switch and the `meta.locale` read.

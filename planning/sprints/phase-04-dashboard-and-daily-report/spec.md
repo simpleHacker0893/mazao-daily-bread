@@ -122,7 +122,7 @@ All figures come from the same pure domain functions (`daySummary`, `customerBal
   `includeCustomerNames` defaults to false (ASSUMPTION, privacy default); when on, a "Customers today" block lists name, bought, paid, owes now.
 - **Share action.** `shareSummary(text)`: if `navigator.share` exists, call it with the text; an `AbortError` (merchant cancelled) does nothing. Otherwise, or on any other error, `navigator.clipboard.writeText(text)` and a snackbar "Copied. Paste it in WhatsApp." If the clipboard is also unavailable, a sheet shows the text pre-selected for manual copy. No network is needed. The text is never logged or sent to Mazao's server (AGENTS.md "Privacy").
 - **Queries.** `useDayReport(today)` wraps `dayReport` with `useLiveQuery`, like `useDaySummary` (blueprint B2). Screens never compute money.
-- **Today screen** ("Leo / Today", static route `/leo`, ASSUMPTION on the route name; client page reading only Dexie, no dynamic segments, D-041). Layout: bilingual title and date; totals block identical in figures to Muhtasari; "Share today's summary" button; the chronological list (oldest first, so the day reads like a notebook page, ASSUMPTION); "Customers today"; "Brought forward" group at the end. Empty state: "Nothing recorded today yet." with New sale.
+- **Today screen** ("Leo / Today", static route `/today`, ASSUMPTION on the route name; client page reading only Dexie, no dynamic segments, D-041). Layout: bilingual title and date; totals block identical in figures to Muhtasari; "Share today's summary" button; the chronological list (oldest first, so the day reads like a notebook page, ASSUMPTION); "Customers today"; "Brought forward" group at the end. Empty state: "Nothing recorded today yet." with New sale.
 - **Muhtasari screen** (`/`). Order, top to bottom, at 360x800:
   1. Bilingual title "Muhtasari / Overview", date line, sync chip.
   2. Hero: "Faida Halisi" with "Net profit today" under it, the figure at 36sp bold tabular in Ink, no card. A negative figure shows a leading minus and stays Ink (Tomato is reserved for overdue, errors and destructive actions).
@@ -134,7 +134,7 @@ All figures come from the same pure domain functions (`daySummary`, `customerBal
   8. "Leo / Today" link row: "See everything recorded today (n)".
   9. Quick actions: full-width primary New sale; outlined New expense and Record payment side by side. Record payment opens the customer picker, then the payment sheet from Phase 3.
 - **Mipangilio screen** (RQ-13, A6 task 1). Bilingual section titles Biashara / Business, Usalama / Security, Hifadhi / Backup, Kuhusu / About. Rows: business name and location; Redo onboarding answers; Bring in your notebook; Change PIN (verify current PIN, then the set-pin flow); Lock now; backup status ("Last backup: today 10:45. Nothing waiting.") with Back up now (`flush()`), disabled offline; app version.
-- **Service worker.** `/leo` is added to the precache route list next to the existing R0 routes (A2), owned by Dev A's shell lane. This is the only change Phase 4 needs from another lane.
+- **Service worker.** `/today` is added to the precache route list next to the existing R0 routes (A2), owned by Dev A's shell lane. This is the only change Phase 4 needs from another lane.
 
 **Design rules (Owner, 2026-10-24)**
 
@@ -169,7 +169,7 @@ A good test checks external behaviour only: given records committed through the 
 
 **Seam 2, screens (Playwright against `pnpm build && pnpm start`, offline after unlock):**
 - Muhtasari after the worked example shows 210 as the hero and the statement 350, 90, 50.
-- Today report shows the same figures and the three entries; `/leo` opens cold offline.
+- Today report shows the same figures and the three entries; `/today` opens cold offline.
 - Share: with `navigator.share` stubbed, the shared text contains "Faida Halisi"; with it absent, the clipboard holds the text and the snackbar shows.
 - Mipangilio: Back up now disabled offline; change PIN requires the current PIN.
 
@@ -197,9 +197,9 @@ A good test checks external behaviour only: given records committed through the 
   - **AC-26:** Opening balance and opening stock entered today appear under "Brought forward" and leave today's Sales and Faida Halisi at 0.
   - **AC-27:** A void made today of a sale dated yesterday appears in today's list, marked as changing yesterday's totals, and today's totals are unchanged.
   - **AC-28:** "Share today's summary" opens the Android share sheet on a real phone, and WhatsApp receives plain text with the Faida Halisi figure; on a browser without Web Share the text is copied with the "Copied" snackbar. Customer names are absent by default.
-  - **AC-29:** `/leo` opens cold offline (added to the AC-09 route list) and its bilingual title reads "Leo" with "Today" beneath (added to AC-21).
+  - **AC-29:** `/today` opens cold offline (added to the AC-09 route list) and its bilingual title reads "Leo" with "Today" beneath (added to AC-21).
   - **AC-30:** impeccable critique of Muhtasari and Today at 360x800 reports no blocking issues: one hero figure, no equal KPI card row, no decorative gradients or glows, AA contrast in a sunlight check.
-- **Blueprint gap:** the Today report has no blueprint step and is not in requirements.md. It needs an RQ (proposed RQ-15) and a step (proposed as an extra B4 task after Muhtasari, Dev B lane, with the `/leo` precache entry in Dev A's lane). Given R-001, the owner should place it in the cut order; a natural split is the list and totals first, then customer activity, then share.
+- **Blueprint gap:** the Today report has no blueprint step and is not in requirements.md. It needs an RQ (proposed RQ-15) and a step (proposed as an extra B4 task after Muhtasari, Dev B lane, with the `/today` precache entry in Dev A's lane). Given R-001, the owner should place it in the cut order; a natural split is the list and totals first, then customer activity, then share.
 - **Questions:** Q-006 (native-speaker check for "Leo", "Wanaokudai", settings section names). Proposed new question: should shared summaries include customer names by default (privacy, Q-001 context)? Q-002 and Q-003 must be closed before the A6 deploy.
 - **Risks:** R-001 (new scope late in the sprint), R-003 (mitigated: Today totals are `daySummary` by construction), R-009 (free tiers), R-010 (stale service worker after deploy; the update toast must be checked on the phones), R-004 (hotspot for forgot PIN).
 - **Inconsistencies noticed:** Stitch 3.7 puts Deni inside the "Money in today" bar, but deni is not money in (DOMAIN.md, D-014); this spec keeps it as a separate line. Stitch 3.14 shows export/delete and several accounts per phone, which are out of R0 (D-039, R3).

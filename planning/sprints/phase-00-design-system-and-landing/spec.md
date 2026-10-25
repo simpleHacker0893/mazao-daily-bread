@@ -145,7 +145,7 @@ The sprint-001 blueprint stays the execution plan. This spec regroups its steps 
 **5. PWA shell (A2; D-040, D-041, D-042).**
 - Manifest: name and short name "Mazao", standalone, start URL `/`, theme and background colours from the design tokens, 192, 512 and maskable icons.
 - Service worker (Serwist) with explicit rules and no spread of the default cache:
-  - Precache: build assets; every static route with the build ID as revision: `/`, `/mauzo`, `/mauzo/new`, `/gharama`, `/gharama/new`, `/deni`, `/deni/customer`, `/bidhaa`, `/mipangilio`, `/onboarding`, `/onboarding/review`, `/notebook`, `/lock`, `/set-pin`, plus `/welcome` (D-044) and the precache-flagged images from the manifest.
+  - Precache: build assets; every static route with the build ID as revision: `/`, `/sales`, `/sales/new`, `/expenses`, `/expenses/new`, `/debts`, `/debts/customer`, `/items`, `/settings`, `/onboarding`, `/onboarding/review`, `/notebook`, `/lock`, `/set-pin`, plus `/welcome` (D-044) and the precache-flagged images from the manifest.
   - Navigations: NetworkFirst with a 3 s timeout, falling back to the precached page matched on path only, so query-string routes work offline (D-041).
   - NetworkOnly for `/api/*` and all Clerk domains.
   - CacheFirst for static build files, fonts and icons; the capped runtime image cache from the imagery pipeline.
@@ -161,7 +161,7 @@ A good test checks behaviour a merchant or builder can observe (a page opens off
 
 Seams, highest first:
 - **Playwright against the built app** (`pnpm build && pnpm start`, never dev). This is the main seam for Phase 0.
-  - Cold offline (prior art: AC-09 and the A2 brief): load `/`, wait for the service worker, open a new page in the same context, go offline, open every route directly including `/welcome`, `/mauzo/new` and `/deni/customer?id=00000000-0000-4000-8000-000000000000`; each renders its bilingual `PageTitle`.
+  - Cold offline (prior art: AC-09 and the A2 brief): load `/`, wait for the service worker, open a new page in the same context, go offline, open every route directly including `/welcome`, `/sales/new` and `/debts/customer?id=00000000-0000-4000-8000-000000000000`; each renders its bilingual `PageTitle`.
   - Offline imagery: with the network off, `/lock` and `/onboarding` render their background image from cache; a header or empty-state image that is not cached leaves no broken-image element.
   - Navigation: all five nav items and the two Zaidi entries show Kiswahili plus English (AC-21 for the shell part); every tap target is at least 48 px.
   - Cache rules: after browsing, no `/api/*` or Clerk response exists in any cache.

@@ -88,7 +88,7 @@ type MoneyFlow = {
 - `useUnsyncedCount()` is unchanged (lines excluded, D-020 queue semantics).
 
 ### Screens and routes
-- Static routes only (D-041), all added to the service-worker precache list: `/manunuzi`, `/manunuzi/new`, `/deni/supplier` (list) and `/deni/supplier/ledger?id=<uuid>`. ASSUMPTION: the existing `/deni` page stays customer deni, and a two-option switch at its top ("Wateja / Customers" and "Wasambazaji / Suppliers") reaches the supplier list as well as the Zaidi sheet.
+- Static routes only (D-041), all added to the service-worker precache list: `/manunuzi`, `/manunuzi/new`, `/debts/supplier` (list) and `/debts/supplier/ledger?id=<uuid>`. ASSUMPTION: the existing `/debts` page stays customer deni, and a two-option switch at its top ("Wateja / Customers" and "Wasambazaji / Suppliers") reaches the supplier list as well as the Zaidi sheet.
 - The Zaidi / More sheet adds Manunuzi / Purchases and Deni la Wasambazaji / Supplier debt, in the order shown in stitch-prompts §1.
 - **New purchase form** (stitch-prompts §4.1): supplier chips with "+ New supplier"; goods-only line picker with quantity, unit and buying price prefilled from the item; helper "Stock goes up when you save."; total; payment as Cash / M-Pesa / "Deni (I owe)". "Deni (I owe)" is a UI shortcut that sets paid to 0; "deni" is never stored as a payment method (DOMAIN.md). With a remainder, "Paid now" and "I owe" (Maize) appear with the supplier due chips. Items can be created inline, as on the sale form.
 - **Supplier debt list and ledger** (stitch-prompts §4.2): total "You owe suppliers", "due this week" in Maize, rows with a Maize or Tomato left bar, ledger with running balance right-aligned, "Pay supplier" bottom sheet with new-balance preview. Empty state: "You don't owe any supplier."
@@ -128,7 +128,7 @@ type MoneyFlow = {
   - **P5-A:** a confirmed purchase updates the item's `buyingPrice` to the purchase unit price (refines D-015). Alternative: keep buying price manual and only warn. Owner to confirm.
   - **P5-B:** `DENI_NEEDS_SUPPLIER` is a hard error like D-038, and fully paid purchases may have no supplier.
   - **P5-C:** "Deni (I owe)" is a UI shortcut only; `paymentMethod` is `null` when nothing is paid.
-  - **P5-D:** where the supplier list lives (the `/deni` switch plus the Zaidi entry, or Zaidi only).
+  - **P5-D:** where the supplier list lives (the `/debts` switch plus the Zaidi entry, or Zaidi only).
 - **Open questions:** Q-006 (native check of "Manunuzi Mapya"); none of Q-001 to Q-005 block this phase.
 - **Risks:** R-003 (wrong numbers): purchases must never leak into Faida Halisi; the extended worked example guards it. R-002 is unchanged by this phase.
 - ASSUMPTION: pilot merchants buy mostly from a small set of repeat suppliers, so recent-supplier chips cover most purchases. Check at the week-1 debrief.

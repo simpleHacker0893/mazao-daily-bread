@@ -16,7 +16,7 @@ B4 is one blueprint step, but its Phase 2 part needs a backend specialist (`doma
 | 3 | P2-3 | B4.3 | Dev B | frontend | default | `feat/b4-notebook` | Task 1, P3-2a (the Phase 3 primitives + pickers ticket) |
 | 4 | P2-4 | B4 Verify | Dev B | qa | default | `feat/b4-onboarding-e2e` | Task 2, Task 3, Phase 1 Task 5 (A4), Phase 3 screens ticket (P3-2: Bidhaa, Deni, new sale), **#20 (hard, AC-31)** |
 
-"The Phase 3 primitives + pickers ticket" is **P3-2a** in PR #23's revision, the early-merging ticket split out of P3-2: the `ui/` primitives (`Button`, `Chip`, `ChipGroup`, `MoneyInput`, `QtyInput`, `Sheet`, `IssueList`, `SaveAnywayDialog`) and the `ui/ledger` pickers (`ItemPicker`, `AddItemSheet`, `CustomerPicker`, `DueChips`). Tasks 2 and 3 do **not** wait for the rest of P3-2 (the ledger screens). Only Task 4 waits for P3-2, because its e2e asserts on `/bidhaa` and `/deni` and records one sale.
+"The Phase 3 primitives + pickers ticket" is **P3-2a** in PR #23's revision, the early-merging ticket split out of P3-2: the `ui/` primitives (`Button`, `Chip`, `ChipGroup`, `MoneyInput`, `QtyInput`, `Sheet`, `IssueList`, `SaveAnywayDialog`) and the `ui/ledger` pickers (`ItemPicker`, `AddItemSheet`, `CustomerPicker`, `DueChips`). Tasks 2 and 3 do **not** wait for the rest of P3-2 (the ledger screens). Only Task 4 waits for P3-2, because its e2e asserts on `/items` and `/debts` and records one sale.
 
 **#20 is a soft blocker for screen tickets** in Phases 1 and 2 (use the background component if merged, otherwise the solid scrim colour). It is a hard blocker only for Task 4, which checks the real onboarding imagery (AC-31).
 
@@ -186,7 +186,7 @@ A merchant copies what their paper notebook already holds into Mazao: who owes t
 
 ### Acceptance criteria
 
-- [ ] Playwright against the build, offline after unlock: add Otieno (new customer) owes 500 → the row shows "Brought forward" and the customer tab total reads "Brought forward: KES 500"; Dexie has exactly 1 customer "Otieno" and 1 opening balance (AC-05, notebook part; the `/deni` check is in Task 4)
+- [ ] Playwright against the build, offline after unlock: add Otieno (new customer) owes 500 → the row shows "Brought forward" and the customer tab total reads "Brought forward: KES 500"; Dexie has exactly 1 customer "Otieno" and 1 opening balance (AC-05, notebook part; the `/debts` check is in Task 4)
 - [ ] Add a supplier (new) owed 800 → the supplier tab total reads "Brought forward: KES 800" and no "Choose who owes this" or deni-customer error appears
 - [ ] Add 10 tray mayai on the stock tab → the row shows 10 tray and "Already brought forward: 10 tray"; adding 2 more shows 12 (AC-06, opening-stock part; the Bidhaa check is in Task 4)
 - [ ] Void the Otieno row → it stays listed struck through as "Voided" and the total returns to KES 0
@@ -222,13 +222,13 @@ Proof that a first-time merchant goes from PIN to a correct notebook offline, th
 
 ### Acceptance criteria
 
-- [ ] e2e: set PIN → `/onboarding` (via `nextRouteAfterPin`) → 3 items (one a service) → review → Set up Mazao → notebook (Otieno owes 500, 10 tray mayai) → Done → `/deni` shows Otieno 500, `/bidhaa` shows 10 tray mayai; selling 3 makes it 7 (AC-05, AC-06); voiding the Otieno opening removes him from `/deni`; today's sales are 0. The blueprint's "Muhtasari shows deni outstanding 500" assertion is added by the Phase 4 Muhtasari ticket, because Muhtasari is built there
+- [ ] e2e: set PIN → `/onboarding` (via `nextRouteAfterPin`) → 3 items (one a service) → review → Set up Mazao → notebook (Otieno owes 500, 10 tray mayai) → Done → `/debts` shows Otieno 500, `/items` shows 10 tray mayai; selling 3 makes it 7 (AC-05, AC-06); voiding the Otieno opening removes him from `/debts`; today's sales are 0. The blueprint's "Muhtasari shows deni outstanding 500" assertion is added by the Phase 4 Muhtasari ticket, because Muhtasari is built there
 - [ ] e2e: Skip on the first question → `/` with the default profile; unlocking again goes to `/`, not `/onboarding`
 - [ ] e2e: close on question 5, unlock → back on question 5 with answers intact (AC-32)
 - [ ] e2e: a restored-profile phone (settings seeded, no progress row) goes from unlock to `/` (spec story 45)
 - [ ] e2e: with `locale = 'sw'` seeded, the stepper, review and notebook titles are Kiswahili; without it, English
 - [ ] Every onboarding background is AVIF or WebP, ≤ 150 KB and precached (build output pasted); impeccable critique at 360x800 reports no blocking contrast issue (AC-31)
-- [ ] Real phone, first-time user: sign-in → set PIN → onboarding (3 items, one a service) → review → notebook → first sale ≤ 10 minutes, timed (AC-15; needs Phase 3 `/mauzo/new`, so recorded when Phase 3 is merged, else in the A6 run)
+- [ ] Real phone, first-time user: sign-in → set PIN → onboarding (3 items, one a service) → review → notebook → first sale ≤ 10 minutes, timed (AC-15; needs Phase 3 `/sales/new`, so recorded when Phase 3 is merged, else in the A6 run)
 - [ ] lint, typecheck, test and build pass
 
 ### Blocked by
@@ -236,7 +236,7 @@ Proof that a first-time merchant goes from PIN to a correct notebook offline, th
 - Task 2
 - Task 3
 - Phase 1 Task 5 (A4: PIN lock)
-- Phase 3 screens ticket (P3-2: Bidhaa, Deni and new sale; the e2e asserts on `/bidhaa` and `/deni` and records one sale)
+- Phase 3 screens ticket (P3-2: Bidhaa, Deni and new sale; the e2e asserts on `/items` and `/debts` and records one sale)
 - #20 (hard: AC-31 checks the real backgrounds)
 
 ---

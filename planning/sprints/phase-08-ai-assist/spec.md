@@ -92,7 +92,7 @@ type ParseResult =
 - Local only (not synced): model consent, model state, drafts, memory.
 
 ### Screens and routes
-- Static routes, precached: `/andika` (Andika Haraka), `/andika/thibitisha` (Review Card, draft ID in the query), `/mipangilio/ai` (Andaa Andika Haraka and model manager).
+- Static routes, precached: `/andika` (Andika Haraka), `/andika/thibitisha` (Review Card, draft ID in the query), `/settings/ai` (Andaa Andika Haraka and model manager).
 - Entry point: a Quick entry action on Muhtasari and the new-record forms, shown only when quick entry is enabled and a parser is available.
 - Design: stitch-prompts §7. "Runs on this phone" chip; a Review Card skeleton while parsing; footer "Nothing is saved until you check and confirm." No purple or blue AI glow, sparkles or chat bubbles; the Review Card looks like a form, not a chat.
 

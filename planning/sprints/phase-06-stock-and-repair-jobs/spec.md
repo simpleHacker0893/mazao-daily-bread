@@ -101,7 +101,7 @@ type Job = {
 - Queries: `useItemStockLedger(id)`, `useLowStock()` (full list), `useJobs(status)`, `useJob(id)`, `useJobAlerts()`.
 
 ### Screens and routes
-- Static routes (D-041), precached: `/bidhaa/item?id=` (detail, stock ledger, edit, adjust), `/bidhaa/low-stock`, `/kazi`, `/kazi/new`, `/kazi/job?id=`.
+- Static routes (D-041), precached: `/items/item?id=` (detail, stock ledger, edit, adjust), `/items/low-stock`, `/kazi`, `/kazi/new`, `/kazi/job?id=`.
 - Kazi list and job card follow stitch-prompts §5.1 and §5.2: status tabs with counts, a Maize alert row, job rows with Tomato for a passed promise, a status stepper, "Mark ready" with the helper "This records the sale. Parts leave stock now.", then "Collected, record payment". Empty state: "No jobs yet. Add one when a customer brings in an item."
 - Zaidi adds Kazi / Repair jobs. Kazi is shown only when the operating profile sells services (ASSUMPTION: a profile flag `jobsEnabled`, defaulting to true when `sells` is `services` or `both`, editable in Mipangilio).
 - Design: Operate mode, core tokens, bilingual titles (D-040), no photos on job cards (D-007), no decorative imagery.
