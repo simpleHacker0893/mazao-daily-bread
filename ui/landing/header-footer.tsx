@@ -8,32 +8,47 @@ import {
   supportHref,
 } from "./primitives";
 
-/** The landing header, shared by /welcome and /privacy. 64 px tall. */
+/**
+ * The landing header, shared by /welcome and /privacy. A 64 px Surface bar that matches the
+ * browser's theme colour, clears the notch, and wraps into two clean rows at large text sizes.
+ */
 export function LandingHeader() {
   return (
-    <header className="sticky top-0 z-30 border-line border-b bg-chalk">
-      <Container className="flex min-h-16 flex-wrap items-center justify-between gap-x-2">
+    <header className="sticky top-0 z-30 border-line border-b bg-surface pt-[env(safe-area-inset-top)]">
+      <Container className="flex min-h-16 flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1.5">
         <Link
           href="/welcome"
-          className={`-ml-1 flex min-h-12 items-center rounded-card px-1 font-extrabold text-2xl text-ink tracking-tight ${focusRing}`}
+          className={`-ml-1 flex min-h-12 items-center rounded-card px-1 font-extrabold text-2xl text-ink tracking-tight md:text-[1.625rem] ${focusRing}`}
         >
           {t("landing.brand")}
         </Link>
         <nav aria-label={t("landing.header.navLabel")}>
-          <ul className="flex flex-wrap items-center justify-end gap-1 md:gap-2">
+          <ul className="flex flex-wrap items-center justify-end gap-x-0.5 gap-y-1 md:gap-x-3">
             <li>
-              <Action href={landingRoutes.demo} variant="text">
+              <Action
+                href={landingRoutes.demo}
+                variant="text"
+                size="headerText"
+              >
                 {t("landing.cta.demo")}
               </Action>
             </li>
             {/* At 360 px there is no room for a third action, and "Start free" reaches the same page. */}
             <li className="hidden md:block">
-              <Action href={landingRoutes.signIn} variant="text">
+              <Action
+                href={landingRoutes.signIn}
+                variant="text"
+                size="headerText"
+              >
                 {t("landing.cta.signIn")}
               </Action>
             </li>
-            <li>
-              <Action href={landingRoutes.start} variant="primary">
+            <li className="md:ml-2">
+              <Action
+                href={landingRoutes.start}
+                variant="primary"
+                size="header"
+              >
                 {t("landing.cta.start")}
               </Action>
             </li>
@@ -48,9 +63,9 @@ const footerLink = `inline-flex min-h-12 items-center rounded-card font-semibold
 
 export function LandingFooter() {
   return (
-    <footer className="border-line border-t bg-chalk">
-      <Container className="flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
-        <p className="font-extrabold text-2xl text-ink tracking-tight">
+    <footer className="border-line border-t bg-chalk pb-[env(safe-area-inset-bottom)]">
+      <Container className="flex flex-col gap-6 py-12 md:flex-row md:items-center md:justify-between">
+        <p className="font-extrabold text-[1.625rem] text-ink tracking-tight">
           {t("landing.brand")}
         </p>
         <nav aria-label={t("landing.footer.navLabel")}>

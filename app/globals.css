@@ -60,6 +60,11 @@ body {
   }
 }
 
+/* Two Chalk landing sections in a row share one gap instead of doubling it. */
+.landing-section[data-tone="chalk"] + .landing-section[data-tone="chalk"] {
+  padding-top: 0;
+}
+
 @keyframes landing-rise {
   from {
     transform: translateY(12px);

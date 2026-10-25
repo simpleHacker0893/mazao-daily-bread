@@ -12,11 +12,18 @@ export const landingRoutes = {
 // Q-011: placeholder until the owner supplies the real support number.
 export const supportHref = "https://wa.me/254700000000";
 
-// Press feedback: one pixel down, 100 ms, nothing under reduced motion.
-const press =
-  "transition-[translate,background-color] duration-100 ease-out active:translate-y-px motion-reduce:transition-none motion-reduce:active:translate-y-0";
 export const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sukuma";
+
+// Headings: rem so they grow with the phone's text size, capped by vw so 200% text never overflows 360 px.
+export const sectionTitle =
+  "font-extrabold text-[min(2rem,10vw)] text-ink leading-[1.1] tracking-tight md:text-5xl";
+export const displayTitle =
+  "font-extrabold text-[min(3rem,13vw)] text-ink leading-none tracking-tight md:text-6xl lg:text-7xl";
+
+// Press feedback only: one pixel down in 100 ms, nothing under reduced motion. Colour changes are instant.
+const press =
+  "transition-[translate] duration-100 ease-out active:translate-y-px motion-reduce:transition-none motion-reduce:active:translate-y-0";
 
 const variants = {
   primary: "bg-sukuma text-surface hover:bg-sukuma-pressed",
@@ -24,21 +31,29 @@ const variants = {
   text: "text-sukuma underline-offset-4 hover:underline",
 } as const;
 
+// lg is the 52 px primary of the hero and closing band; header keeps 52 px with tighter sides for 360 px.
+const sizes = {
+  md: "min-h-12 px-3",
+  // Header actions: tight sides below 768 px so the brand and both actions share one 360 px row.
+  headerText: "min-h-12 px-2 md:px-3",
+  header: "min-h-[52px] px-3 md:px-5",
+  lg: "min-h-[52px] px-6 text-lg",
+} as const;
+
 type ActionProps = {
   href: string;
   children: ReactNode;
   variant: keyof typeof variants;
-  size?: "md" | "lg";
+  size?: keyof typeof sizes;
 };
 
 /** A landing action. Prefetch is off so the page never spends the merchant's data on routes they may not open. */
 export function Action({ href, children, variant, size = "md" }: ActionProps) {
-  const height = size === "lg" ? "min-h-[52px] px-6 text-lg" : "min-h-12 px-3";
   return (
     <Link
       href={href}
       prefetch={false}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-card font-bold ${height} ${variants[variant]} ${press} ${focusRing}`}
+      className={`inline-flex items-center justify-center text-center rounded-card font-bold sm:whitespace-nowrap ${sizes[size]} ${variants[variant]} ${press} ${focusRing}`}
     >
       {children}
     </Link>
@@ -93,16 +108,60 @@ export function LandingImage({
   );
 }
 
+const widths = {
+  page: "max-w-[1200px]",
+  reading: "max-w-[760px]",
+} as const;
+
 export function Container({
   children,
+  width = "page",
   className = "",
 }: {
   children: ReactNode;
+  width?: keyof typeof widths;
   className?: string;
 }) {
   return (
-    <div className={`mx-auto w-full max-w-[1200px] px-4 md:px-8 ${className}`}>
+    <div
+      className={`mx-auto w-full px-5 md:px-8 lg:px-10 ${widths[width]} ${className}`}
+    >
       {children}
     </div>
+  );
+}
+
+const tones = {
+  chalk: "bg-chalk",
+  surface: "border-line border-y bg-surface",
+  // Deni and warnings colour (globals.css), as a quiet band.
+  maize: "bg-maize-tint",
+} as const;
+
+export type Tone = keyof typeof tones;
+
+/**
+ * One landing section with the shared vertical rhythm. Two Chalk sections in a row share
+ * one gap instead of doubling it (`.landing-section` in globals.css).
+ */
+export function Section({
+  tone,
+  labelledBy,
+  className = "py-16 lg:py-24",
+  children,
+}: {
+  tone: Tone;
+  labelledBy: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      aria-labelledby={labelledBy}
+      data-tone={tone}
+      className={`landing-section ${tones[tone]} ${className}`}
+    >
+      {children}
+    </section>
   );
 }

@@ -1,14 +1,32 @@
 import { render } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { landing as enLanding } from "@/i18n/en.landing";
+import { privacy as enPrivacy } from "@/i18n/en.privacy";
 import { landing as swLanding } from "@/i18n/sw.landing";
+import { privacy as swPrivacy } from "@/i18n/sw.privacy";
 
 // A stub t() that returns the key, so any text that is not a key stands out.
 vi.mock("@/i18n/t", () => ({ t: (key: string) => key }));
 
-const { default: WelcomePage } = await import("@/app/(shell)/welcome/page");
+const { default: LandingLayout } = await import(
+  "@/app/(shell)/(landing)/layout"
+);
+const { default: WelcomePage, metadata: welcomeMeta } = await import(
+  "@/app/(shell)/(landing)/welcome/page"
+);
+const { default: PrivacyPage, metadata: privacyMeta } = await import(
+  "@/app/(shell)/(landing)/privacy/page"
+);
 
-const landingKeys = new Set(Object.keys(enLanding));
+const halves = [
+  ["landing", enLanding, swLanding],
+  ["privacy", enPrivacy, swPrivacy],
+] as const;
+const knownKeys = new Set([
+  ...Object.keys(enLanding),
+  ...Object.keys(enPrivacy),
+]);
 
 function visibleStrings(root: HTMLElement): string[] {
   const strings: string[] = [];
@@ -26,19 +44,36 @@ function visibleStrings(root: HTMLElement): string[] {
   return strings;
 }
 
-describe("landing i18n", () => {
-  it("every landing key has an English and a Kiswahili value", () => {
-    for (const key of landingKeys) {
-      expect(key.startsWith("landing."), key).toBe(true);
-      expect(enLanding[key as keyof typeof enLanding].trim(), key).not.toBe("");
-      expect(swLanding[key as keyof typeof swLanding].trim(), key).not.toBe("");
-    }
-  });
+function renderInLayout(page: ReactElement) {
+  return render(
+    <LandingLayout params={Promise.resolve({})}>{page}</LandingLayout>,
+  );
+}
 
-  it("/welcome shows no text, alt or aria label that bypasses i18n", () => {
-    const { container } = render(<WelcomePage />);
-    const strings = visibleStrings(container);
-    expect(strings.length).toBeGreaterThan(20);
-    expect(strings.filter((text) => !landingKeys.has(text))).toEqual([]);
-  });
+describe("landing and privacy i18n", () => {
+  for (const [prefix, en, sw] of halves) {
+    it(`every ${prefix}.* key has a non-empty English and Kiswahili value`, () => {
+      for (const [key, value] of Object.entries(en)) {
+        expect(key.startsWith(`${prefix}.`), key).toBe(true);
+        expect(value.trim(), key).not.toBe("");
+        expect((sw as Record<string, string>)[key]?.trim(), key).toBeTruthy();
+      }
+    });
+  }
+
+  for (const [path, Page, metadata] of [
+    ["/welcome", WelcomePage, welcomeMeta],
+    ["/privacy", PrivacyPage, privacyMeta],
+  ] as const) {
+    it(`${path} shows no text, alt, aria label or meta that bypasses i18n`, () => {
+      const { container } = renderInLayout(<Page />);
+      const strings = [
+        ...visibleStrings(container),
+        String(metadata.title),
+        String(metadata.description),
+      ];
+      expect(strings.length).toBeGreaterThan(10);
+      expect(strings.filter((text) => !knownKeys.has(text))).toEqual([]);
+    });
+  }
 });
