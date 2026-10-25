@@ -2,19 +2,49 @@
 @source not "../.claude";
 @source not "../.agents";
 
-/* Light theme only (design tokens: Surface, Ink). A2 replaces these with the full token set. */
-:root {
-  --background: #fcfdfb;
-  --foreground: #141a16;
+/* Mazao design tokens (docs/design/stitch-prompts.md). Light theme only.
+   Each colour becomes a utility: bg-chalk, text-ink, border-line, bg-sukuma… */
+@theme {
+  /* Backgrounds */
+  --color-chalk: #f3f5f2;
+  --color-surface: #fcfdfb;
+  --color-line: #d5dcd6;
+
+  /* Text */
+  --color-ink: #141a16;
+  --color-moss: #4e5a52;
+
+  /* Sukuma Green is the only action colour */
+  --color-sukuma: #14532d;
+  --color-sukuma-pressed: #0d3b20;
+
+  /* Deni and warnings */
+  --color-maize: #8a5a00;
+  --color-maize-tint: #fff1c9;
+
+  /* Overdue, errors, destructive */
+  --color-tomato: #b42318;
+  --color-tomato-tint: #fdecea;
+
+  /* M-Pesa segments in money bars only */
+  --color-mpesa: #35556b;
+
+  /* 8px everywhere; 16px top corners on bottom sheets only */
+  --radius-card: 8px;
+  --radius-sheet: 16px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-chalk);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular numerals on every money figure */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
