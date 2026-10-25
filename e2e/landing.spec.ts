@@ -195,14 +195,15 @@ test.describe("accessibility", () => {
 });
 
 test.describe("pages", () => {
-  test("/ is the landing page and /welcome redirects to it (D-055)", async ({
+  test("/ is the landing page and /welcome no longer exists (D-055)", async ({
     page,
   }) => {
-    await page.goto("/welcome");
-    await expect(page).toHaveURL("/");
+    await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       t("landing.hero.title"),
     );
+    const response = await page.goto("/welcome");
+    expect(response?.status()).toBe(404);
   });
 
   test("/privacy renders and the footer links to it", async ({ page }) => {

@@ -20,7 +20,6 @@ export const shell = {
   "shell.page.today": "Today",
   "shell.page.lock": "Enter your PIN",
   "shell.page.setPin": "Set your PIN",
-  "shell.page.welcome": "Welcome to Mazao",
 
   // Bottom nav and the More drawer
   "shell.nav.label": "Main navigation",

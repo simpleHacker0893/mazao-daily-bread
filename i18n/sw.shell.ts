@@ -21,7 +21,6 @@ export const shell: Record<keyof typeof en, string> = {
   "shell.page.today": "Leo",
   "shell.page.lock": "Weka PIN yako",
   "shell.page.setPin": "Weka PIN",
-  "shell.page.welcome": "Karibu Mazao",
 
   "shell.nav.label": "Urambazaji mkuu",
   "shell.nav.overview": "Muhtasari",

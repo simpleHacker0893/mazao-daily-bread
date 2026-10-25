@@ -1,4 +1,4 @@
-// English landing half (/welcome, #22). English only for now (D-049, D-050).
+// English landing half (the landing page at /, #22, D-055). English only for now (D-049, D-050).
 // No testimonials, statistics or features outside R0 (Q-010).
 export const landing = {
   "landing.meta.title": "Mazao: know your real profit",
