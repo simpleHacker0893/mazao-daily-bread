@@ -35,7 +35,7 @@ Every PR is reviewed by the `reviewer` agent, and the `qa` agent runs its Verify
 
 **File ownership** (R-011):
 - **Dev A:**
-  - `app/(shell)/*`, `app/(app)/layout.tsx` (AppShell + LockGuard), `app/(app)/mipangilio`;
+  - `app/(shell)/*`, `app/(app)/layout.tsx` (AppShell + LockGuard), `app/(app)/settings`;
   - `app/api/*`, `auth/*`, `sync/*`, `server/*`, `ui/shell/*` (nav, SyncChip, update toast);
   - `proxy.ts`, `prisma/*`, `public/*`, config files, `i18n/en.shell.ts`, `i18n/sw.shell.ts`.
 - **Dev B:**
@@ -62,11 +62,11 @@ app/
   (shell)/set-pin/page.tsx
   (app)/layout.tsx           # AppShell: bottom nav, sync chip, LockGuard
   (app)/page.tsx             # Muhtasari
-  (app)/mauzo/page.tsx, mauzo/new/page.tsx
-  (app)/gharama/page.tsx, gharama/new/page.tsx
-  (app)/deni/page.tsx, deni/customer/page.tsx   # customer ledger: /deni/customer?id=<uuid> (static route, precachable)
-  (app)/bidhaa/page.tsx
-  (app)/mipangilio/page.tsx
+  (app)/sales/page.tsx, sales/new/page.tsx
+  (app)/expenses/page.tsx, expenses/new/page.tsx
+  (app)/debts/page.tsx, debts/customer/page.tsx   # customer ledger: /debts/customer?id=<uuid> (static route, precachable)
+  (app)/items/page.tsx
+  (app)/settings/page.tsx
   (app)/onboarding/page.tsx, onboarding/review/page.tsx
   (app)/notebook/page.tsx
   api/bootstrap/route.ts
@@ -86,7 +86,7 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
 
 **Rules:**
 - Every page under `(app)`, plus `(shell)/lock` and `(shell)/set-pin`, is a **client page with no server data fetching and no dynamic route segments**. Data comes only from Dexie. Parameters go in the query string, read through `useSearchParams` wrapped in `<Suspense>`. This lets the service worker precache every page.
-- **Page titles are bilingual** (D-040): the `PageTitle` primitive renders the Kiswahili title with the English translation beneath it. Bottom-nav items show the Kiswahili label with a small English caption.
+- **English UI, one language per label** (D-049, D-050): the `PageTitle` primitive renders one English title; bottom-nav items show one English label. Routes and route folders are English. Kiswahili strings stay typed in `i18n/sw.*`; the switch ships in a later phase.
 
 ---
 
@@ -227,26 +227,26 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
    - theme and background colours from the **design-system tokens** in `docs/design/stitch-prompts.md`;
    - 192/512 icons plus a maskable icon in `public/icons/`.
 2. Serwist (`@serwist/next`, webpack build). **Don't spread `defaultCache`.** It caches `/api` GETs and cross-origin calls. Write explicit rules instead:
-   - **Precache:** the build assets, plus `additionalPrecacheEntries` for every static route: `/`, `/mauzo`, `/mauzo/new`, `/gharama`, `/gharama/new`, `/deni`, `/deni/customer`, `/bidhaa`, `/mipangilio`, `/onboarding`, `/onboarding/review`, `/notebook`, `/lock`, `/set-pin`, `/leo`, `/welcome` (once built). Each has `revision` = the build ID.
-   - **Navigations:** NetworkFirst with a 3 s timeout, falling back to the precached page **matched on the path only** (`ignoreSearch: true`), so `/deni/customer?id=…` works offline.
+   - **Precache:** the build assets, plus `additionalPrecacheEntries` for every static route: `/`, `/sales`, `/sales/new`, `/expenses`, `/expenses/new`, `/debts`, `/debts/customer`, `/items`, `/settings`, `/onboarding`, `/onboarding/review`, `/notebook`, `/lock`, `/set-pin`, `/today`, `/welcome` (once built). Each has `revision` = the build ID.
+   - **Navigations:** NetworkFirst with a 3 s timeout, falling back to the precached page **matched on the path only** (`ignoreSearch: true`), so `/debts/customer?id=…` works offline.
    - **NetworkOnly** for `/api/*`, and for all Clerk domains (`*.clerk.accounts.dev`, `clerk.*`, the Clerk frontend API).
    - **CacheFirst** for `/_next/static/*`, fonts and icons.
 3. Update flow: when a new service worker is waiting, show a toast ("Update available. Tap to reload."); `skipWaiting` on tap.
 4. `(app)/layout.tsx` AppShell:
-   - a bottom nav with 5 items at every screen width (no sidebar in R0), each Kiswahili label over a small English caption:
-     - Muhtasari / Overview `/`;
-     - Mauzo / Sales `/mauzo`;
-     - Deni / Debts `/deni`;
-     - Gharama / Expenses `/gharama`;
-     - Zaidi / More (drawer: Bidhaa / Items, Mipangilio / Settings).
+   - a bottom nav with 5 items at every screen width (no sidebar in R0), English labels only:
+     - Overview `/`;
+     - Sales `/sales`;
+     - Debts `/debts`;
+     - Expenses `/expenses`;
+     - More (drawer: Items `/items`, Settings `/settings`).
    - Tap targets ≥ 48 px. Font and colours from the design-system tokens, through `next/font`.
-5. `PageTitle` primitive (Kiswahili title + English subtitle) in `ui/`. A2 creates it and Dev B owns it afterwards.
+5. `PageTitle` primitive (one English title) in `ui/`. A2 creates it and Dev B owns it afterwards.
 6. `SyncChip` in `ui/shell/`, reading `useSyncStatus()`. A2 stubs the hook; A5 implements it.
 7. Placeholder pages for every route, using `PageTitle` and `t()`.
 8. Playwright `e2e/offline-shell.spec.ts` (`webServer`: `pnpm build && pnpm start`), **cold**:
    1. Load `/` and wait for `navigator.serviceWorker.ready`.
    2. Open a **new page** in the same context and `context.setOffline(true)`.
-   3. Open every route directly, including `/deni/customer?id=00000000-0000-4000-8000-000000000000` and `/mauzo/new`. Each must render its `PageTitle`.
+   3. Open every route directly, including `/debts/customer?id=00000000-0000-4000-8000-000000000000` and `/sales/new`. Each must render its `PageTitle`.
 
 **Verify:** `pnpm build && pnpm exec playwright test e2e/offline-shell.spec.ts`. The Lighthouse PWA installability check passes on the preview URL.
 
@@ -380,25 +380,25 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
 
 **Tasks**
 1. Primitives in `ui/`: `Button, Chip, ChipGroup, MoneyInput` (integer shillings → cents), `QtyInput` (fractional per item, max 3 decimals), `Sheet`, `IssueList`, `SaveAnywayDialog`.
-2. **Bidhaa / Items** `/bidhaa`:
+2. **Bidhaa / Items** `/items`:
    - a list grouped by kind; goods rows show **stock on hand** with a low-stock marker;
    - an "Add item" sheet with a kind toggle, where services hide the stock fields;
    - no edit in R0.
 3. **Mauzo / Sales:**
-   - **`/mauzo/new`:**
+   - **`/sales/new`:**
      - line editor; item picker sheet (recent → search → "Add new item");
      - payment method chips; amount paid defaults to the total.
      - When paid < total: a deni section with the customer picker/creator and due chips (profile default preselected).
      - A live `runGrill` preview above Save. Hard errors disable Save with the reason shown. `NeedsOverride` opens `SaveAnywayDialog`.
-   - **`/mauzo`:** today's list, a detail sheet, and Void (with confirmation; hidden when `!canVoid`).
-4. **Gharama / Expenses:** `/gharama/new` and `/gharama`, with category chips from the profile plus "Add category".
+   - **`/sales`:** today's list, a detail sheet, and Void (with confirmation; hidden when `!canVoid`).
+4. **Gharama / Expenses:** `/expenses/new` and `/expenses`, with category chips from the profile plus "Add category".
 5. **Deni / Debts:**
-   - `/deni`: overdue first, the total outstanding, and a "Record payment" button per row.
-   - `/deni/customer?id=…`: ledger with a running balance, "Brought forward" labels, voided rows struck through and labelled "Voided", and a payment sheet.
+   - `/debts`: overdue first, the total outstanding, and a "Record payment" button per row.
+   - `/debts/customer?id=…`: ledger with a running balance, "Brought forward" labels, voided rows struck through and labelled "Voided", and a payment sheet.
 
 **Verify:** Playwright `e2e/ledger.spec.ts` against the build, offline after unlock:
 1. The worked example entered through the UI.
-2. Wanjiku 300 / paid 100 → `/deni` shows 200.
+2. Wanjiku 300 / paid 100 → `/debts` shows 200.
 3. A payment of 150 → 50.
 4. Void the payment → 200, with the voided row shown.
 5. Opening stock of 10 tray mayai, sell 3 → Bidhaa shows 7.
@@ -471,7 +471,7 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
    - tabs: Customers who owe you / You owe suppliers / Stock you have;
    - each row → `commitOpening` / `commitStockAdjustment` with `source: 'onboarding'`;
    - Done → `/`.
-4. **Leo / Today report** `/leo` (RQ-15, D-047):
+4. **Leo / Today report** `/today` (RQ-15, D-047):
    - `useTodayReport(today)` in `local/queries.ts` returns the day's records and per-customer activity, built from the same domain functions as Muhtasari, so the totals match by construction;
    - a "Share today's summary" button (`navigator.share`, falling back to clipboard).
 5. `local/routing.ts` `nextRouteAfterPin()`: no profile in settings → `/onboarding`; otherwise `/`.
@@ -485,7 +485,7 @@ e2e/             # Playwright (runs against `pnpm build && pnpm start`, never `d
 ## A6: Mipangilio, integrate, deploy, pilot kit (Dev A; Dev B joins at 23:00; devops + qa agents)
 
 **Tasks**
-1. **Mipangilio / Settings** `/mipangilio`:
+1. **Mipangilio / Settings** `/settings`:
    - account email, change PIN (verify the current PIN, then `/set-pin`), lock now;
    - re-run onboarding, open the notebook;
    - sync status + "Back up now" (`flush()`), app version.
@@ -513,7 +513,7 @@ Already applied: multi-account (D-039), the sidebar, Repeat last sale, Bidhaa ed
 1. Restore-by-pull. Push stays; a new phone starts empty, one phone per merchant. **Waives AC-19.**
 2. Onboarding reduced to business name, type and items. **Waives part of AC-15**: the time target still applies.
 3. The `PRICE_VARIANCE` and `POSSIBLE_DUPLICATE` rules.
-3a. The per-customer section and Share on `/leo`. The chronological list and totals stay. **Waives AC-28.**
+3a. The per-customer section and Share on `/today`. The chronological list and totals stay. **Waives AC-28.**
 4. The Gharama list screen; the new-expense form stays. Today's expenses still show on Muhtasari.
 
 **Never cut:**

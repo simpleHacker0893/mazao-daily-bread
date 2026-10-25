@@ -35,7 +35,7 @@ This replaces the blueprint's "B3 Sun 12:00–18:00, B4 Sun 18:00–23:00" for D
 
 - Package manager **pnpm only**. Latest Next.js App Router, **no `src/`**, React Compiler on; no hand-written `useMemo`/`useCallback`/`memo`; render stays pure. Build is `next build --webpack` (D-042). Biome only.
 - TypeScript strict + `noUncheckedIndexedAccess`.
-- **Offline first.** Every page in this phase is a client page that reads only from Dexie, with no server data fetching and no dynamic segments. Parameters go in the query string, read with `useSearchParams` inside `Suspense`, for example `/deni/customer?id=<uuid>` (D-041). These tasks never touch `/api/*` or the server.
+- **Offline first.** Every page in this phase is a client page that reads only from Dexie, with no server data fetching and no dynamic segments. Parameters go in the query string, read with `useSearchParams` inside `Suspense`, for example `/debts/customer?id=<uuid>` (D-041). These tasks never touch `/api/*` or the server.
 - **One save path.** Pages write only through `local/save.ts` (Task 1), which wraps `local/commit.ts` (B2). No page or component touches Dexie tables directly.
 - **Pure numbers.** Every money figure on screen comes from a `domain` function, through a `local/queries.ts` hook or `local/save.ts`. Components and hooks never add, subtract, multiply, negate or round money. That includes line totals, the sale total, the deni remainder, the running balance, the new-balance preview, the payment quick amounts, a credit amount and the deni list totals.
 - **Money:** integer cents in `domain` and the client (D-013). `lineTotal = Math.round(qty * unitPrice)`. `MoneyInput` takes whole shillings and returns cents.
@@ -186,24 +186,24 @@ Unusual entries are questioned, never refused, except deni without a customer, w
 1. **Shared ledger components** in `ui/ledger/` (exported from `ui/ledger/index.ts`):
    - `TxnDetailSheet` (`{ txnId: Id; onClose(): void }`), built on `useTxnDetail`, which covers **any** txn type. For a sale it shows the lines, payment, customer, due date and "Saved with a warning: …" for each override. For an expense it shows the category, method, note and date. For a payment it shows the customer, method and M-Pesa code. For an opening balance it shows the customer and the "Brought forward" tag. A void row shows what it voided. Void appears only when `canVoid`. The confirm text for a sale is "Void this sale? It stays in your records, marked Voided. Stock and deni go back." **ASSUMPTION (OQ-3.11):** for the other types it is "Void this record? It stays in your records, marked Voided." Mauzo, Gharama, the customer ledger and Leo (P4-3) all use this one sheet.
    - `RecordPaymentSheet` (`{ customerId?: Id; onDone(): void }`; with no `customerId` it opens `CustomerPicker` first). Quick chips come from `usePaymentPreview(...).quick`: "All KES n" from `all`, then one chip per value in `rounds`. The new-balance preview comes from `usePaymentPreview`. When the merchant overpays (`creditCreated > 0`), it shows "That's KES n more than <name> owes. It will be kept as credit." with n = `creditCreated`, and still saves. Phase 4 (Muhtasari) also uses this sheet.
-2. **Bidhaa / Items** `/bidhaa`:
+2. **Bidhaa / Items** `/items`:
    - Goods first, then services. Goods rows show the unit, the selling and buying price, the stock on hand, and a Maize "Low" tag at or below the threshold. Services show "Service, no stock".
    - "Add item" opens `AddItemSheet` (Task 2a). No editing in R0.
-3. **New sale** `/mauzo/new`:
+3. **New sale** `/sales/new`:
    - The line editor uses `ItemPicker`. The unit price is prefilled and editable. Line and sale totals come from `useSaleDraftTotals`.
    - Payment method chips (cash, M-Pesa, other) are filtered to the profile's methods; which one is preselected follows **OQ-3.4**. "M-Pesa code (optional)" appears only for M-Pesa. Amount paid defaults to the total, and there's an "All on deni" shortcut (**OQ-3.3**).
    - When paid < total, the deni section shows "Deni KES n" in Maize, with `CustomerPicker` (required) and `DueChips`. Until a customer is chosen, Save stays disabled and "Choose who owes this" shows at the picker.
    - `useGrillPreview` shows issues above Save. A hard error disables Save and shows the reason. Warnings save on the first tap. `needs_override` opens `SaveAnywayDialog`, and "Save anyway" calls `saveSale(draft, { override: true })`.
-   - **ASSUMPTION (OQ-3.10):** on `saved`, always go to `/mauzo`, including when New sale was opened from Muhtasari.
-4. **Sales** `/mauzo`:
+   - **ASSUMPTION (OQ-3.10):** on `saved`, always go to `/sales`, including when New sale was opened from Muhtasari.
+4. **Sales** `/sales`:
    - Today's sales, newest first: time (`formatNairobiTime`), item summary, total, method, a Maize "Deni: <name>" badge, a "Voided" struck-through state, and a small cloud-off icon while unsynced.
    - Tapping a row opens `TxnDetailSheet`.
    - Empty state: "No sales today yet."
-5. **New expense** `/gharama/new`: amount, category chips from the profile plus "Add category" (appended to the profile through `saveSettings`), method chips, an optional note, and the date (default today; earlier days per **OQ-3.2**). **Expenses** `/gharama` lists today's expenses; tapping one opens `TxnDetailSheet`, where Void is offered (**Cut 4** may drop this list).
-6. **Customer debt** `/deni`:
+5. **New expense** `/expenses/new`: amount, category chips from the profile plus "Add category" (appended to the profile through `saveSettings`), method chips, an optional note, and the date (default today; earlier days per **OQ-3.2**). **Expenses** `/expenses` lists today's expenses; tapping one opens `TxnDetailSheet`, where Void is offered (**Cut 4** may drop this list).
+6. **Customer debt** `/debts`:
    - From `useDeniList(today)`: a header with the total outstanding and the overdue total (in Tomato), then rows with name, balance and earliest due date. Each row has a left bar (Tomato when overdue, Maize when not yet due), plus text ("overdue" / "due tomorrow", from the dictionary) so colour is never the only signal, and "Record payment".
    - Empty state: "Nobody owes you money right now."
-7. **Customer ledger** `/deni/customer?id=<uuid>`:
+7. **Customer ledger** `/debts/customer?id=<uuid>`:
    - The balance line from `standing` (`customerStanding`): "Otieno owes you KES 1,200" (in Tomato only when overdue), "Otieno owes nothing now", or, **ASSUMPTION (OQ-3.9)**, "Otieno is in credit KES n" with n = `standing.amount`. Then `useCustomerLedgerRows`, newest first. Each row shows the date and time, what happened (with method and code), a "Brought forward" tag where it applies, voided rows struck through and labelled "Voided", the amount and the running balance.
    - Tapping any row opens `TxnDetailSheet`; Void is offered there on payment and opening-balance rows (and on sale rows when `canVoid`).
    - "Record payment" opens `RecordPaymentSheet` for this customer.
@@ -213,15 +213,15 @@ Unusual entries are questioned, never refused, except deni without a customer, w
 ### Acceptance criteria
 
 - [ ] The e2e test enters the DOMAIN.md worked example through the UI. The day-summary query then shows Sales KES 350, COGS 90, Expenses 50, Faida Halisi 210, cash 150 and M-Pesa 200. (AC-03 UI part; the Muhtasari display is checked in P4-2.)
-- [ ] e2e: Wanjiku buys 300 and pays 100 → `/deni` shows 200; a payment of 150 → 50; void the payment from her ledger → 200, with the payment row struck through and labelled "Voided" (AC-04).
-- [ ] e2e: opening stock of 10 tray mayai (seeded through the fixture), sell 3 → `/bidhaa` shows 7. Sell 8 more → a `NEGATIVE_STOCK` warning shows and the sale saves on the first tap (AC-06).
+- [ ] e2e: Wanjiku buys 300 and pays 100 → `/debts` shows 200; a payment of 150 → 50; void the payment from her ledger → 200, with the payment row struck through and labelled "Voided" (AC-04).
+- [ ] e2e: opening stock of 10 tray mayai (seeded through the fixture), sell 3 → `/items` shows 7. Sell 8 more → a `NEGATIVE_STOCK` warning shows and the sale saves on the first tap (AC-06).
 - [ ] e2e: paid < total with no customer → Save is disabled and "Choose who owes this" shows. No path, including "Save anyway", saves it (AC-07 UI part).
 - [ ] e2e with a profile seeded `rules.negativeStock = 'block'`: overselling opens "Save anyway", saving needs that second tap, and the stored txn has `overrides: ['NEGATIVE_STOCK']` (AC-08).
-- [ ] e2e, cold offline: `/deni/customer?id=<seeded id>` opens directly with the network off and shows that customer's real ledger, not just the placeholder (AC-09, ledger routes).
+- [ ] e2e, cold offline: `/debts/customer?id=<seeded id>` opens directly with the network off and shows that customer's real ledger, not just the placeholder (AC-09, ledger routes).
 - [ ] e2e: a sale mixing a service line and a goods line saves. Only the goods item's stock moves.
 - [ ] e2e: an item without `allowsFractional` rejects 1.5. A fractional item accepts 2.5 through the half-step button.
 - [ ] e2e: with Otieno owing 320, Record payment shows the chips "All KES 320", 300, 200 and 100. Paying 400 shows "That's KES 80 more than Otieno owes. It will be kept as credit.", and the ledger balance line then reads in credit 80.
-- [ ] e2e: an ushuru expense of 50 voided from `/gharama` through `TxnDetailSheet` is struck through and the day's Expenses drop by 50.
+- [ ] e2e: an ushuru expense of 50 voided from `/expenses` through `TxnDetailSheet` is struck through and the day's Expenses drop by 50.
 - [ ] e2e: a voided sale shows no Void button in `TxnDetailSheet`, and neither does a void row.
 - [ ] e2e: every page in this phase shows its English title by default (Sales, New sale, Expenses, New expense, Customer debt, Items). After the locale is set to `sw` (seeded `meta.locale = 'sw'` until P4-4 ships the control), the same pages show their `sw` dictionary titles and nav labels with no reload. Market words (deni, ushuru, kilo, tray) are identical in both (AC-21 for these pages, as proposed to be reworded).
 - [ ] Every interactive element is at least 48×48 px at 360 px.
@@ -243,7 +243,7 @@ Unusual entries are questioned, never refused, except deni without a customer, w
 The scrum-architect applies these at the Sun 18:00 checkpoint, strictly in order.
 
 - **Cut 3: drop the `PRICE_VARIANCE` and `POSSIBLE_DUPLICATE` rules.** The rules come off the grill (B1) and stop showing in the preview. Task 2 then drops nothing: `IssueList` is generic. In Task 1, the table-driven preview test and the AC-33 fixture (P4-5: the step-2b duplicate and the 280 mayai sale) lose their `PRICE_VARIANCE` and `POSSIBLE_DUPLICATE` expectations. Waives no AC.
-- **Cut 4: drop the Gharama list screen** (`/gharama`). The new-expense form stays, and today's expenses still show on Muhtasari and Leo. Expense void is then reachable only by tapping the expense in Leo (P4-3, through `TxnDetailSheet`). **Cut 4 is valid only once P4-3 has merged with that tap working**, because void is never cut. Waives no AC.
+- **Cut 4: drop the Gharama list screen** (`/expenses`). The new-expense form stays, and today's expenses still show on Muhtasari and Leo. Expense void is then reachable only by tapping the expense in Leo (P4-3, through `TxnDetailSheet`). **Cut 4 is valid only once P4-3 has merged with that tap working**, because void is never cut. Waives no AC.
 
 **Never cut** (this phase carries several of these): offline save; **correct Faida Halisi and deni** (Task 1 maths, the AC-03/AC-04 checks); **void** (`TxnDetailSheet` on sales, expenses, payments and opening balances). The blueprint's "bilingual titles" item is superseded by D-049. **Proposed replacement, needs owner confirmation:** "all copy through `t()` in both `en` and `sw`, English by default".
 
@@ -258,7 +258,7 @@ The scrum-architect applies these at the Sun 18:00 checkpoint, strictly in order
 - **OQ-3.7 (spec inconsistency):** Step 7 of the spec's "full day" sells mayai at KES 300 against 420 and expects a price warning. But 120/420 is 28.6%, which is under the 30% threshold, so `PRICE_VARIANCE` doesn't fire. The AC-33 fixture in P4-5 uses KES 280 (33% away). Confirm, or change the threshold instead.
 - **OQ-3.8 (Task 1, Task 2):** The spec says the payment chips are "All KES n" plus "round amounts below it", without defining them. Interim (ASSUMPTION): up to 3 multiples of KES 100 strictly below the balance, largest first. Is that right, or should the steps scale with the balance (for example multiples of 500 above KES 2,000)?
 - **OQ-3.9 (Task 1, Task 2):** In the customer ledger, a voided record and its void both show, struck through, with a running-balance change of 0 (ASSUMPTION), so the balance never shows the mistake. The alternative is to show the original adding and the void subtracting. Which matches how merchants read their notebook? Also: the credit wording on the balance line, "Otieno is in credit KES n" (ASSUMPTION, borrowed from Leo's "in credit KES n").
-- **OQ-3.10 (Task 2):** After saving a sale, where does the merchant land? Interim (ASSUMPTION): always `/mauzo`, even when she started New sale from Muhtasari. Alternatives: back to where she came from, or stay on a fresh New sale form for the next customer.
+- **OQ-3.10 (Task 2):** After saving a sale, where does the merchant land? Interim (ASSUMPTION): always `/sales`, even when she started New sale from Muhtasari. Alternatives: back to where she came from, or stay on a fresh New sale form for the next customer.
 - **OQ-3.11 (Task 2):** Void confirm wording for expenses, payments and opening balances. The spec gives only the sale wording. Interim (ASSUMPTION): "Void this record? It stays in your records, marked Voided."
 - **OQ-3.12 (all tasks; D-049 reconciliation):** D-049 as written on `feat/a1a-skeleton` leaves open whether market words stay untranslated in the English UI, with an interim of plain English (Debts, Net profit). The owner's instruction for these plans keeps D-005 (market words untranslated in both locales). Which wins, and does it apply to titles ("Customer debt" vs "Customer deni") and to the due chips (Kesho, Ijumaa)? Until answered, this plan follows D-005 for body market words and uses the D-040 English titles.
 - **OQ-3.13 (all tasks; with Q-006):** Must the `sw` dictionary be complete, real Kiswahili for the pilot, or may some `sw` values temporarily repeat the English? Who writes the Kiswahili copy, and who validates it (Q-006 native-speaker check)? Typecheck forces every key to exist in `sw`, but not that the value is Kiswahili.

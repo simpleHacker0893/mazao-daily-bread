@@ -89,7 +89,7 @@ type PeriodReport = {
 - **Export:** builds JSON (all local tables except the sync queue, AI drafts and PIN material) and CSV files (transactions with lines flattened, customers, suppliers, items, jobs). ASSUMPTION: CSVs are delivered as one zip; if the zip library is too heavy, CSVs are offered one by one.
 
 ### Screens and routes
-- Static routes (D-041), precached: `/ripoti`, `/ripoti/pdf?period=…`, `/mipangilio/data`.
+- Static routes (D-041), precached: `/ripoti`, `/ripoti/pdf?period=…`, `/settings/data`.
 - Zaidi adds Ripoti / Reports. Mipangilio gains "Data yako / Your data" (stitch-prompts translation table).
 - **Design:** Operate mode with core tokens. One hero figure (Faida Halisi 36sp, tabular), three aligned columns, plain tables with tabular figures right-aligned, top-item bars with no background track, Slate only on M-Pesa. No KPI-card grids, no gradients, no donut charts, no eyebrow labels. An empty state for a period with no records may carry the one header illustration allowed here; the PDF has no imagery. Note "Reports work offline." shown once.
 

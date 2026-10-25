@@ -113,7 +113,7 @@ Relevant decisions: D-001…D-028, D-034…D-042 (D-038…D-042 supersede earlie
 - Sync status and a "Back up now" button, plus app version.
 
 ### RQ-15 Leo / Today report (D-047, Owner)
-- Route `/leo`, with the title "Leo" over "Today". It's reached from Muhtasari ("See everything today") and works offline.
+- Route `/today`, with the title "Leo" over "Today". It's reached from Muhtasari ("See everything today") and works offline.
 - It lists every record of the Nairobi day in time order: sales, expenses, payments received, deni given, opening balances (under "Brought forward"), and voids (struck through).
 - Totals reconcile exactly with Muhtasari.
 - A per-customer section shows each customer active today: bought, paid, owes now.

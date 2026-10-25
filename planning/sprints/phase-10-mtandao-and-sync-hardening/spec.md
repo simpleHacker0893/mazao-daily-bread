@@ -61,7 +61,7 @@ type NetEdge = { from: Id; to: Id; direction: 'sells_to' | 'buys_from' | 'item_f
 ```
   Volume = confirmed sale or purchase totals in the period (voids excluded); `owes` = current balance (not period-bound). Ranking is by volume; the remainder collapses into one group node per kind.
 - Rendering: a lightweight graph library, the builder's choice (spec §4), dynamically imported. The layout is computed in a worker or with a node-count cap so the main thread stays responsive. Legend uses shapes, not decorative dots (stitch-prompts §9.1).
-- Routes (static, D-041, precached): `/mtandao`, with the list view as `/mtandao?view=list`. Node taps route to the existing ledgers: `/deni/customer?id=`, the phase 5 supplier ledger, and the phase 6 item page.
+- Routes (static, D-041, precached): `/mtandao`, with the list view as `/mtandao?view=list`. Node taps route to the existing ledgers: `/debts/customer?id=`, the phase 5 supplier ledger, and the phase 6 item page.
 - Zaidi adds Mtandao / Network. Empty state: "Record a few sales and purchases to see your network." This empty state may use the one header illustration allowed; the map itself has no imagery.
 
 ### Sync hardening
@@ -88,7 +88,7 @@ type PushResult = {
 - **Session expiry:** Clerk session expiry already maps to "Sign in to back up" (R0); Backup health adds the time since the last successful push.
 
 ### Screens
-- `/mipangilio/backup` "Hifadhi / Backup" health panel (stitch-prompts translation table): last backup time, records waiting, quarantined records with plain-English reasons, clock warning, and "Back up now".
+- `/settings/backup` "Hifadhi / Backup" health panel (stitch-prompts translation table): last backup time, records waiting, quarantined records with plain-English reasons, clock warning, and "Back up now".
 - Design: Operate mode, core tokens, Tomato only for genuinely failed records; no charts here.
 
 ## Testing Decisions
@@ -102,7 +102,7 @@ type PushResult = {
   - Server and client `customerBalance` agree for the DOMAIN.md worked example and the phase 5 and 6 scenarios (prior art: AC-03, AC-04, AC-11).
   - Logs captured during the suite contain no customer names, amounts or phone numbers.
 - **Domain tests:** `buildNetwork` ranks, groups beyond 50, excludes voids, and sets `owes` correctly; period boundaries in Africa/Nairobi.
-- **Playwright on the built app:** offline, open Mtandao, tap a node, open the ledger; the list view renders the same top customer; the cold-offline route check is extended to `/mtandao` and `/mipangilio/backup`.
+- **Playwright on the built app:** offline, open Mtandao, tap a node, open the ledger; the list view renders the same top customer; the cold-offline route check is extended to `/mtandao` and `/settings/backup`.
 - Manual: Mtandao on a 3 GB phone with 200 customers stays responsive (interaction under 200 ms, ASSUMPTION target).
 
 ## Out of Scope

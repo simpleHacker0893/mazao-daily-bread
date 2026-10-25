@@ -2,7 +2,7 @@
 
 _Rolling snapshot. Edit in place; never append a log._
 
-**Updated:** 2026-10-24 (Sat, evening)
+**Updated:** 2026-10-25 (Sun, early morning)
 **Phase:** Phase 0 (design system, imagery and landing) is in progress. The app skeleton and Neon backend are on `main`.
 **Next milestone:** R0 pilot with 5 merchants in Gikomba, **Mon 2026-10-26**.
 
@@ -29,7 +29,7 @@ _Rolling snapshot. Edit in place; never append a log._
   - `server/storage.ts` uses the Files SDK on `assets`;
   - `GET /api/health` returns `{"database":"ok","storage":"ok"}`, verified on `pnpm start` and on `pnpm dev` (full upload → download → delete round trip).
 - **Prisma 8 (D-048):** owner's choice of the latest version. 8.0.0-rc.27 CLI with `@prisma/orm-postgres` 8.0.0-rc.20. The contract (`prisma/contract.prisma`) is still empty; models come in Phase 1 (A5).
-- **Language (D-049):** English is the default UI language; Kiswahili is a switch in Settings. This supersedes the Kiswahili-first and bilingual naming in D-004 and D-040. Open question: do market words (deni, Faida Halisi) stay untranslated in English?
+- **Language (D-049):** English is the default UI language; Kiswahili is a switch in Settings. This supersedes the Kiswahili-first and bilingual naming in D-004 and D-040. **D-050 (2026-10-25):** routes, route folders and nav are English (`/sales`, `/expenses`, `/debts`, `/items`, `/settings`, `/today`); one English label per title and nav item; Kiswahili translation is a later phase. Planning docs were updated to the new paths.
 - **Stitch (D0, #21, partial; PR #28 merged as "Part of #21"):**
   - project `2699180917177352710`, design system "Mazao Market Tool", prompts v3 (English-first, mobile + desktop);
   - only the style board and a landing draft exist, and the landing draft is rejected because its copy is Kiswahili;
@@ -55,7 +55,7 @@ See `planning/ROADMAP.md`. Phases 0–4 form the R0 pilot. Specs are in `plannin
 |---|---|---|
 | #15 | A1a skeleton + contracts | **Done** (PR #25) |
 | #16 | A1b CI, Vercel, Prisma init | Open. Prisma init and the Neon env template are already done here; CI and Vercel remain |
-| #17 | A2 app shell + nav | Open (unblocked) |
+| #17 | A2 app shell + nav | **In progress** on `feat/a2-shell-nav-2` (uncommitted): English routes and nav, `PageTitle`, `BottomNav` + More drawer, `SyncChip` on a stub `useSyncStatus()`, tokens in `@theme`, Playwright `e2e/shell.spec.ts`. lint, typecheck, test (17), build and e2e (21) pass. Issue text still describes the old bilingual nav |
 | #18 | A2 installable offline PWA | Open |
 | #19 | Imagery pipeline | Open (unblocked; Stitch photos available) |
 | #20 | Auth/onboarding backgrounds | Open |
@@ -64,5 +64,4 @@ See `planning/ROADMAP.md`. Phases 0–4 form the R0 pilot. Specs are in `plannin
 
 ## Owner actions before Monday
 - Check the Stitch project in the web UI. Jobs are stuck in "Generating…".
-- Answer the D-049 market-words question.
 - See `planning/QUESTIONS.md`, Q-001 to Q-003.

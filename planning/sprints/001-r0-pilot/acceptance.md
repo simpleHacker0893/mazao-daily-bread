@@ -14,11 +14,11 @@ The product-owner agent reviews the claims against this file. "Tests pass" alone
   3. Void the payment → **200**.
 
   The voided row shows struck through and labelled "Voided".
-- **AC-05:** Opening balance for Otieno, 500 → `/deni` shows 500. Muhtasari's today Sales stays **0**.
+- **AC-05:** Opening balance for Otieno, 500 → `/debts` shows 500. Muhtasari's today Sales stays **0**.
 - **AC-06:** Opening stock of 10 tray mayai, then selling 3 → the **Bidhaa list shows 7**. Selling 8 more shows a `NEGATIVE_STOCK` warning, and the sale saves (default profile = warn).
 - **AC-07:** A sale with deni and no customer **cannot be saved, even with an override** (D-038). The app shows `DENI_NEEDS_CUSTOMER` and the customer picker; the unit test proves `override: true` still throws.
 - **AC-08:** With the profile seeded `rules.negativeStock = 'block'`, overselling opens "Save anyway". Saving needs that second tap, and the stored txn has `overrides: ['NEGATIVE_STOCK']`. This is proven in the B2 unit test and in the e2e test with a seeded profile.
-- **AC-09:** **Cold offline:** after the service worker installs, a new page with the network off opens every route directly, including `/mauzo/new` and `/deni/customer?id=…` (`e2e/offline-shell.spec.ts`, run against `pnpm build && pnpm start`).
+- **AC-09:** **Cold offline:** after the service worker installs, a new page with the network off opens every route directly, including `/sales/new` and `/debts/customer?id=…` (`e2e/offline-shell.spec.ts`, run against `pnpm build && pnpm start`).
 - **AC-10:** PIN:
   - wrong PIN ×5 shows a countdown of ≥ 30 s;
   - the correct PIN unlocks while offline;
@@ -62,7 +62,7 @@ The product-owner agent reviews the claims against this file. "Tests pass" alone
 - **AC-26:** An opening balance and opening stock entered today appear under "Brought forward" and leave today's Sales and Faida Halisi at 0.
 - **AC-27:** A void made today of a sale dated yesterday appears in today's list, marked as changing yesterday's totals. Today's totals are unchanged.
 - **AC-28:** On a real phone, "Share today's summary" opens the Android share sheet, and WhatsApp receives plain text with the Faida Halisi figure. A browser without Web Share copies the text and shows "Copied". Customer names are absent by default.
-- **AC-29:** `/leo` opens cold offline (it's part of the AC-09 route list), and its bilingual title reads "Leo" with "Today" beneath (part of AC-21).
+- **AC-29:** `/today` opens cold offline (it's part of the AC-09 route list), and its bilingual title reads "Leo" with "Today" beneath (part of AC-21).
 - **AC-30:** An impeccable critique of Muhtasari and Today at 360x800 reports no blocking issues: one hero figure, no row of equal KPI cards, no decorative gradients or glows, AA contrast in a sunlight check.
 - **AC-31:** Every onboarding background image is AVIF or WebP, at most 150 KB and precached. All text over it passes WCAG AA at 360x800.
 - **AC-32:** Closing the app on onboarding question 5 and unlocking again resumes at question 5 with the earlier answers intact.
