@@ -12,8 +12,8 @@ vi.mock("@/i18n/t", () => ({ t: (key: string) => key }));
 const { default: LandingLayout } = await import(
   "@/app/(shell)/(landing)/layout"
 );
-const { default: WelcomePage, metadata: welcomeMeta } = await import(
-  "@/app/(shell)/(landing)/welcome/page"
+const { default: LandingPage, metadata: landingMeta } = await import(
+  "@/app/(shell)/(landing)/page"
 );
 const { default: PrivacyPage, metadata: privacyMeta } = await import(
   "@/app/(shell)/(landing)/privacy/page"
@@ -62,7 +62,7 @@ describe("landing and privacy i18n", () => {
   }
 
   for (const [path, Page, metadata] of [
-    ["/welcome", WelcomePage, welcomeMeta],
+    ["/", LandingPage, landingMeta],
     ["/privacy", PrivacyPage, privacyMeta],
   ] as const) {
     it(`${path} shows no text, alt, aria label or meta that bypasses i18n`, () => {

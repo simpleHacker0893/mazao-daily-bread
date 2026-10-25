@@ -11,7 +11,7 @@ import {
   sectionTitle,
 } from "./primitives";
 
-// The /welcome sections, top to bottom (#32, stall-front split). No two adjacent sections share a layout.
+// The landing page sections, top to bottom (#32, stall-front split). No two adjacent sections share a layout.
 
 /** A heading and one plain sentence: the shape of most landing lists. */
 type TitledText = [title: MessageKey, body: MessageKey];

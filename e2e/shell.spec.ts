@@ -1,9 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
 import { type MessageKey, t } from "@/i18n/t";
 
-// Every R0 placeholder route and its title key (#17, English routes per D-050).
+// Every R0 placeholder route and its title key (#17, English routes per D-050; Overview at /dashboard per D-055).
 const routes: [path: string, title: MessageKey][] = [
-  ["/", "shell.page.overview"],
+  ["/dashboard", "shell.page.overview"],
   ["/sales", "shell.page.sales"],
   ["/sales/new", "shell.page.sales.new"],
   ["/expenses", "shell.page.expenses"],
@@ -50,7 +50,7 @@ test("the customer debt page keeps the id from the query string", async ({
 
 test.describe("bottom nav at 360px", () => {
   test("shows the five tabs in English", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/dashboard");
     const nav = page.getByRole("navigation", { name: t("shell.nav.label") });
     await expect(nav.getByRole("link")).toHaveText([
       t("shell.nav.overview"),
@@ -64,7 +64,7 @@ test.describe("bottom nav at 360px", () => {
   });
 
   test("every tab and More entry is at least 48x48px", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/dashboard");
     const nav = page.getByRole("navigation", { name: t("shell.nav.label") });
     const targets = [
       ...(await nav.getByRole("link").all()),
@@ -90,7 +90,7 @@ test.describe("bottom nav at 360px", () => {
   test("More opens a drawer that reaches Items and Settings", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/dashboard");
     await page.getByRole("button", { name: t("shell.nav.more") }).click();
     const drawer = page.getByRole("dialog", { name: t("shell.nav.more") });
     await drawer.getByRole("link", { name: t("shell.nav.settings") }).click();
@@ -102,7 +102,7 @@ test.describe("bottom nav at 360px", () => {
   });
 
   test("Escape closes the drawer", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/dashboard");
     await page.getByRole("button", { name: t("shell.nav.more") }).click();
     const drawer = page.getByRole("dialog", { name: t("shell.nav.more") });
     await expect(drawer).toBeVisible();
@@ -117,7 +117,7 @@ test.describe("bottom nav at 1280px", () => {
   test("still shows the bottom nav and no sidebar (D-040)", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/dashboard");
     const nav = page.getByRole("navigation", { name: t("shell.nav.label") });
     await expect(nav).toBeVisible();
     const box = await nav.boundingBox();

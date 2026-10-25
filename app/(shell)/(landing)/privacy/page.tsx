@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { type MessageKey, t } from "@/i18n/t";
 import { Container } from "@/ui/landing/primitives";
 
-// Static and precached, like /welcome. Provisional text until the owner supplies the notice (Q-011).
+// Static and precached, like the landing page. Provisional text until the owner supplies the notice (Q-011).
 export const metadata: Metadata = {
   title: t("privacy.meta.title"),
   description: t("privacy.meta.description"),

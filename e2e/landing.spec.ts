@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { t } from "@/i18n/t";
 
-// /welcome and /privacy on the built app (#22, spec #32).
+// The landing page at / and /privacy on the built app (#22, spec #32; at / per D-055).
 
 async function scrollToBottom(page: Page) {
   await page.evaluate(async () => {
@@ -22,11 +22,11 @@ test.describe("calls to action", () => {
     test(`every "${t(label)}" link (header, hero, closing band) goes to ${path}`, async ({
       page,
     }) => {
-      await page.goto("/welcome");
+      await page.goto("/");
       const links = page.getByRole("link", { name: t(label), exact: true });
       await expect(links).toHaveCount(3);
       for (let i = 0; i < 3; i++) {
-        await page.goto("/welcome");
+        await page.goto("/");
         await links.nth(i).click();
         await expect(page).toHaveURL(path);
       }
@@ -38,7 +38,7 @@ test.describe("calls to action", () => {
       name: t("landing.cta.signIn"),
       exact: true,
     });
-    await page.goto("/welcome");
+    await page.goto("/");
     await expect(signIn).toBeHidden();
     await page.setViewportSize({ width: 768, height: 800 });
     await signIn.click();
@@ -46,7 +46,7 @@ test.describe("calls to action", () => {
   });
 
   test("every link and button is at least 48 px tall", async ({ page }) => {
-    await page.goto("/welcome");
+    await page.goto("/");
     for (const target of await page
       .locator("a:visible, summary:visible")
       .all()) {
@@ -68,7 +68,7 @@ test.describe("loading order", () => {
       await held;
       await route.continue();
     });
-    await page.goto("/welcome", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(
       page.getByRole("heading", { level: 1, name: t("landing.hero.title") }),
     ).toBeVisible();
@@ -82,7 +82,7 @@ test.describe("loading order", () => {
   });
 
   test("only the hero photo is eager; the rest are lazy", async ({ page }) => {
-    await page.goto("/welcome");
+    await page.goto("/");
     const loading = await page
       .locator("main img")
       .evaluateAll((all) => all.map((img) => img.getAttribute("loading")));
@@ -109,7 +109,7 @@ test.describe("loading order", () => {
         .match(/\/images\/landing\/([a-z-]+)-\d+\.webp/)?.[1];
       if (name) requested.add(name);
     });
-    await page.goto("/welcome");
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
     for (const name of ["boda-rider", "duka-shelf", "phone-fundi-kiosk"]) {
       expect([...requested], name).not.toContain(name);
@@ -124,12 +124,12 @@ test.describe("loading order", () => {
 });
 
 test.describe("network isolation", () => {
-  test("/welcome makes no Clerk request and no /api request", async ({
+  test("/ (landing) makes no Clerk request and no /api request", async ({
     page,
   }) => {
     const urls: string[] = [];
     page.on("request", (request) => urls.push(request.url()));
-    await page.goto("/welcome");
+    await page.goto("/");
     await scrollToBottom(page);
     await page.waitForLoadState("networkidle");
     expect(urls.length).toBeGreaterThan(0);
@@ -144,7 +144,7 @@ test.describe("accessibility", () => {
   const tags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
   for (const width of [360, 1280]) {
-    for (const path of ["/welcome", "/privacy"]) {
+    for (const path of ["/", "/privacy"]) {
       test(`${path} has no WCAG AA violations at ${width} px`, async ({
         page,
       }) => {
@@ -160,7 +160,7 @@ test.describe("accessibility", () => {
   test("the FAQ opens from the keyboard and announces its state", async ({
     page,
   }) => {
-    await page.goto("/welcome");
+    await page.goto("/");
     const question = page.locator("summary", {
       hasText: t("landing.faq.free.question"),
     });
@@ -177,7 +177,7 @@ test.describe("accessibility", () => {
     await expect(answer).toBeHidden();
   });
 
-  for (const path of ["/welcome", "/privacy"]) {
+  for (const path of ["/", "/privacy"]) {
     test(`${path} reflows at 200% text with no sideways scroll at 360 px`, async ({
       page,
     }) => {
@@ -195,8 +195,18 @@ test.describe("accessibility", () => {
 });
 
 test.describe("pages", () => {
-  test("/privacy renders and the footer links to it", async ({ page }) => {
+  test("/ is the landing page and /welcome redirects to it (D-055)", async ({
+    page,
+  }) => {
     await page.goto("/welcome");
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      t("landing.hero.title"),
+    );
+  });
+
+  test("/privacy renders and the footer links to it", async ({ page }) => {
+    await page.goto("/");
     await page.getByRole("link", { name: t("landing.footer.privacy") }).click();
     await expect(page).toHaveURL("/privacy");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -204,8 +214,8 @@ test.describe("pages", () => {
     );
   });
 
-  test("/welcome has its title and description", async ({ page }) => {
-    await page.goto("/welcome");
+  test("/ (landing) has its title and description", async ({ page }) => {
+    await page.goto("/");
     await expect(page).toHaveTitle(t("landing.meta.title"));
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       "content",
@@ -216,16 +226,16 @@ test.describe("pages", () => {
 
 test.describe("offline", () => {
   // Needs the service worker and precache from #18, which is not merged yet.
-  test.fixme("/welcome and /privacy open cold offline after one visit (#18)", async ({
+  test.fixme("/ (landing) and /privacy open cold offline after one visit (#18)", async ({
     browser,
   }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto("/welcome");
+    await page.goto("/");
     await page.evaluate(() => navigator.serviceWorker.ready);
     await context.setOffline(true);
     for (const [path, title] of [
-      ["/welcome", t("landing.hero.title")],
+      ["/", t("landing.hero.title")],
       ["/privacy", t("privacy.title")],
     ] as const) {
       await page.goto(path);

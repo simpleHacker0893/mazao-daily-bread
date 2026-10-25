@@ -9,7 +9,7 @@ import {
 } from "./primitives";
 
 /**
- * The landing header, shared by /welcome and /privacy. A 64 px Surface bar that matches the
+ * The landing header, shared by the landing page (/) and /privacy. A 64 px Surface bar that matches the
  * browser's theme colour, clears the notch, and wraps into two clean rows at large text sizes.
  */
 export function LandingHeader() {
@@ -17,7 +17,7 @@ export function LandingHeader() {
     <header className="sticky top-0 z-30 border-line border-b bg-surface pt-[env(safe-area-inset-top)]">
       <Container className="flex min-h-16 flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1.5">
         <Link
-          href="/welcome"
+          href="/"
           className={`-ml-1 flex min-h-12 items-center rounded-card px-1 font-extrabold text-2xl text-ink tracking-tight md:text-[1.625rem] ${focusRing}`}
         >
           {t("landing.brand")}
