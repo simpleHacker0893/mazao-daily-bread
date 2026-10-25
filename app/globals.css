@@ -5,10 +5,10 @@
 /* Mazao design tokens (docs/design/stitch-prompts.md). Light theme only.
    Each colour becomes a utility: bg-chalk, text-ink, border-line, bg-sukuma… */
 @theme {
-  /* Backgrounds */
-  --color-chalk: #f3f5f2;
-  --color-surface: #fcfdfb;
-  --color-line: #d5dcd6;
+  /* Backgrounds: "Maize morning", warm like daftari paper (owner's choice, 2026-10-25) */
+  --color-chalk: #f7f2e4;
+  --color-surface: #fdfaf2;
+  --color-line: #e0d8c6;
 
   /* Text */
   --color-ink: #141a16;
@@ -42,6 +42,13 @@ body {
   background: var(--color-chalk);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+  caret-color: var(--color-sukuma);
+  accent-color: var(--color-sukuma);
+}
+
+::selection {
+  background: var(--color-sukuma);
+  color: var(--color-surface);
 }
 
 /* Tabular numerals on every money figure */

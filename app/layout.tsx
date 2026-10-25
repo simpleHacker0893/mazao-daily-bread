@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 // cover: the shell pads for the phone's gesture area with safe-area insets.
 export const viewport: Viewport = {
-  themeColor: "#fcfdfb",
+  themeColor: "#fdfaf2",
   viewportFit: "cover",
 };
 
