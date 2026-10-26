@@ -143,6 +143,7 @@ These are house rules. Don't re-litigate them; to change one, propose a supersed
   - Raw SQL for the conditional last-write-wins upsert uses Prisma 8's typed SQL lane (`db.sql`), never string-built SQL.
   - Prisma 8 needs PostgreSQL 15 or newer (Neon meets this).
 
+  - **Version note (2026-10-26, Phase 1 Task 2):** the pair is aligned where it matters. The `prisma` CLI's own version does not track the runtime's: `prisma@8.0.0-rc.27` is built on `@prisma/orm-toolchain@8.0.0-rc.20` (the same toolchain as `@prisma/orm-postgres@8.0.0-rc.20`), while `prisma@8.0.0-rc.20` is built on toolchain rc.14 and fails `contract emit`. Keep CLI rc.27 with runtime rc.20; when bumping, match the CLI's `@prisma/orm-toolchain` dependency to the runtime version, not the CLI's own number.
 - **D-049 (Owner, 2026-10-24, supersedes the naming parts of D-004 and D-040):** **English is the default UI language; Kiswahili is a switch.**
   - Every string (page titles, navigation, buttons, body text) shows in English by default. The bilingual "Kiswahili title with English beneath" pattern of D-040 is dropped.
   - The merchant can switch the whole UI to Kiswahili in Mipangilio/Settings (also offered once during sign-in or onboarding). The choice is stored on the phone in the device database `meta` table under the key `locale`.

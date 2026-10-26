@@ -24,3 +24,10 @@ test("app pages are not redirected by the server when signed out", async ({
   expect(response?.status()).toBe(200);
   await expect(page).toHaveURL("/sales");
 });
+
+test("POST /api/bootstrap with no session is 401, not 500 (proxy.ts is wired)", async ({
+  request,
+}) => {
+  const response = await request.post("/api/bootstrap");
+  expect(response.status()).toBe(401);
+});

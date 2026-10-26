@@ -13,6 +13,8 @@ export default defineConfig({
       "node_modules/**",
       ".next/**",
       "e2e/**",
+      // Needs a database: run with `pnpm test:db`.
+      "**/*.db.test.ts",
       ".claude/**",
       ".agents/**",
     ],
