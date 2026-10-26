@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { ReactNode } from "react";
+import { ClerkReconnect } from "./clerk-reconnect";
 
 // Clerk's prebuilt UI in the Mazao world: Manrope, 8px radius, Sukuma as the only action
 // colour, Maize-morning surfaces. Values mirror the tokens in app/globals.css.
@@ -34,10 +35,13 @@ export function ClerkRoot({ children }: { children: ReactNode }) {
       appearance={appearance}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
-      signInFallbackRedirectUrl="/dashboard"
-      signUpFallbackRedirectUrl="/dashboard"
+      // Every sign-in returns to the sign-in screen, which bootstraps and decides where to go
+      // (/set-pin, then /dashboard; or /lock when this phone already has the account).
+      signInFallbackRedirectUrl="/sign-in"
+      signUpFallbackRedirectUrl="/sign-up"
       afterSignOutUrl="/"
     >
+      <ClerkReconnect />
       {children}
     </ClerkProvider>
   );

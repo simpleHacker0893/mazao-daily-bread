@@ -49,6 +49,27 @@ export const shell = {
     "A mama mboga at her vegetable stall in Gikomba market, checking her phone",
   "shell.auth.demo": "Try the demo first",
   "shell.auth.home": "Mazao home",
+
+  // Sign-in screen (Phase 1 Task 3)
+  "shell.signIn.title": "Welcome to Mazao",
+  "shell.signIn.privacy.heading": "Your data",
+  "shell.signIn.privacy.store":
+    "We keep your email and the business records you enter.",
+  "shell.signIn.privacy.eu": "Backups are stored on a secure server in the EU.",
+  "shell.signIn.privacy.pin": "Your PIN never leaves this phone.",
+  "shell.signIn.privacy.delete": "To delete your data, ask the pilot team.",
+  "shell.signIn.privacy.link": "Read the privacy notice",
+  "shell.signIn.agree": "I agree",
+  "shell.signIn.offline": "You're offline. Connect once to sign in.",
+  "shell.signIn.working": "Bringing back your records…",
+  "shell.signIn.error":
+    "Could not reach Mazao. Check your connection and try again.",
+  "shell.signIn.retry": "Try again",
+  "shell.signIn.refused.before": "This phone belongs to",
+  "shell.signIn.refused.after":
+    "Ask the owner to remove their account in Settings first.",
+  "shell.signIn.resetMismatch":
+    "That email is not the account on this phone. Use the email you signed up with.",
 } as const;
 
 // Bottom-nav order.

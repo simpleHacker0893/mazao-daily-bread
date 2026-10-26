@@ -1,18 +1,21 @@
-import { SignUp } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { t } from "@/i18n/t";
 import { DemoLink } from "@/ui/auth/DemoLink";
+import { SignInScreen } from "@/ui/auth/SignInScreen";
 
 export const metadata: Metadata = {
   title: t("shell.auth.signUp.title"),
   description: t("shell.auth.description"),
 };
 
-// Hash routing keeps this one static page (no catch-all segment, D-041).
+// Static page: the screen reads ?mode=reset on the client, inside Suspense.
 export default function SignUpPage() {
   return (
     <>
-      <SignUp routing="hash" />
+      <Suspense>
+        <SignInScreen variant="signUp" />
+      </Suspense>
       <DemoLink />
     </>
   );
