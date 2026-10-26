@@ -39,6 +39,16 @@ export const shell = {
   "shell.sync.signInToBackUp": "Sign in to back up",
 
   "shell.lock.title": "Enter your PIN",
+
+  // Sign-in and sign-up pages (Clerk)
+  "shell.auth.signIn.title": "Sign in: Mazao",
+  "shell.auth.signUp.title": "Start free: Mazao",
+  "shell.auth.description":
+    "Sign in to Mazao to record sales, deni and expenses and back them up.",
+  "shell.auth.photoAlt":
+    "A mama mboga at her vegetable stall in Gikomba market, checking her phone",
+  "shell.auth.demo": "Try the demo first",
+  "shell.auth.home": "Mazao home",
 } as const;
 
 // Bottom-nav order.

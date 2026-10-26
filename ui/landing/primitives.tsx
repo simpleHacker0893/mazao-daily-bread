@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-// Where the landing actions go. /sign-in arrives with Clerk (step 11); /demo with D-051.
+// Where the landing actions go: Clerk's sign-up and sign-in pages, and the public demo (D-051).
 export const landingRoutes = {
-  start: "/sign-in",
+  start: "/sign-up",
   signIn: "/sign-in",
   demo: "/demo",
   privacy: "/privacy",

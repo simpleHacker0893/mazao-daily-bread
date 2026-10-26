@@ -30,3 +30,6 @@ next-env.d.ts
 # Background agent worktrees
 .claude/worktrees/
 .neon
+
+# Playwright Clerk auth state
+playwright/.clerk/

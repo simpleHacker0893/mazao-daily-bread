@@ -16,7 +16,7 @@ async function scrollToBottom(page: Page) {
 
 test.describe("calls to action", () => {
   for (const [label, path] of [
-    ["landing.cta.start", "/sign-in"],
+    ["landing.cta.start", "/sign-up"],
     ["landing.cta.demo", "/demo"],
   ] as const) {
     test(`every "${t(label)}" link (header, hero, closing band) goes to ${path}`, async ({

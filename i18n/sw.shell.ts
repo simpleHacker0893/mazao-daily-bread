@@ -38,4 +38,13 @@ export const shell: Record<keyof typeof en, string> = {
   "shell.sync.signInToBackUp": "Ingia ili kuhifadhi",
 
   "shell.lock.title": "Weka PIN yako",
+
+  "shell.auth.signIn.title": "Ingia: Mazao",
+  "shell.auth.signUp.title": "Anza bure: Mazao",
+  "shell.auth.description":
+    "Ingia Mazao uandike mauzo, deni na gharama na kuzihifadhi.",
+  "shell.auth.photoAlt":
+    "Mama mboga kwenye kibanda chake cha mboga katika soko la Gikomba, akiangalia simu yake",
+  "shell.auth.demo": "Jaribu onyesho kwanza",
+  "shell.auth.home": "Mwanzo wa Mazao",
 };
