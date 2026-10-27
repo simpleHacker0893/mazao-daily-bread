@@ -20,7 +20,6 @@ export const shell = {
   "shell.page.today": "Today",
   "shell.page.lock": "Enter your PIN",
   "shell.page.setPin": "Set your PIN",
-  "shell.page.welcome": "Welcome to Mazao",
 
   // Bottom nav and the More drawer
   "shell.nav.label": "Main navigation",
@@ -40,6 +39,37 @@ export const shell = {
   "shell.sync.signInToBackUp": "Sign in to back up",
 
   "shell.lock.title": "Enter your PIN",
+
+  // Sign-in and sign-up pages (Clerk)
+  "shell.auth.signIn.title": "Sign in: Mazao",
+  "shell.auth.signUp.title": "Start free: Mazao",
+  "shell.auth.description":
+    "Sign in to Mazao to record sales, deni and expenses and back them up.",
+  "shell.auth.photoAlt":
+    "A mama mboga at her vegetable stall in Gikomba market, checking her phone",
+  "shell.auth.demo": "Try the demo first",
+  "shell.auth.home": "Mazao home",
+
+  // Sign-in screen (Phase 1 Task 3)
+  "shell.signIn.title": "Welcome to Mazao",
+  "shell.signIn.privacy.heading": "Your data",
+  "shell.signIn.privacy.store":
+    "We keep your email and the business records you enter.",
+  "shell.signIn.privacy.eu": "Backups are stored on a secure server in the EU.",
+  "shell.signIn.privacy.pin": "Your PIN never leaves this phone.",
+  "shell.signIn.privacy.delete": "To delete your data, ask the pilot team.",
+  "shell.signIn.privacy.link": "Read the privacy notice",
+  "shell.signIn.agree": "I agree",
+  "shell.signIn.offline": "You're offline. Connect once to sign in.",
+  "shell.signIn.working": "Bringing back your records…",
+  "shell.signIn.error":
+    "Could not reach Mazao. Check your connection and try again.",
+  "shell.signIn.retry": "Try again",
+  "shell.signIn.refused.before": "This phone belongs to",
+  "shell.signIn.refused.after":
+    "Ask the owner to remove their account in Settings first.",
+  "shell.signIn.resetMismatch":
+    "That email is not the account on this phone. Use the email you signed up with.",
 } as const;
 
 // Bottom-nav order.

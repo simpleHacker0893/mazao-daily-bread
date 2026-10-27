@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BottomNav } from "./BottomNav";
 import { isActiveRoute } from "./nav";
 
-const pathname = vi.hoisted(() => ({ current: "/" }));
+const pathname = vi.hoisted(() => ({ current: "/dashboard" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.current }));
 
 describe("BottomNav", () => {
   beforeEach(() => {
-    pathname.current = "/";
+    pathname.current = "/dashboard";
   });
 
   it("shows the five tabs in English only, in order", () => {
@@ -22,7 +22,7 @@ describe("BottomNav", () => {
     const hrefs = within(screen.getByRole("navigation"))
       .getAllByRole("link")
       .map((link) => link.getAttribute("href"));
-    expect(hrefs).toEqual(["/", "/sales", "/debts", "/expenses"]);
+    expect(hrefs).toEqual(["/dashboard", "/sales", "/debts", "/expenses"]);
   });
 
   it("marks the tab for a nested route as the current page", () => {
@@ -44,9 +44,10 @@ describe("BottomNav", () => {
 });
 
 describe("isActiveRoute", () => {
-  it("matches Overview only on the root", () => {
-    expect(isActiveRoute("/", "/")).toBe(true);
-    expect(isActiveRoute("/sales", "/")).toBe(false);
+  it("matches Overview on /dashboard, never on the landing page (D-055)", () => {
+    expect(isActiveRoute("/dashboard", "/dashboard")).toBe(true);
+    expect(isActiveRoute("/", "/dashboard")).toBe(false);
+    expect(isActiveRoute("/sales", "/dashboard")).toBe(false);
   });
 
   it("matches nested routes but not look-alike prefixes", () => {

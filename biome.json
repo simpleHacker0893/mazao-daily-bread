@@ -20,10 +20,12 @@
       "!**/.devin",
       "!**/.windsurf",
       "!**/.superpowers",
+      "!**/.impeccable",
       "!docs",
       "!planning",
       "!prisma/contract.json",
       "!prisma/contract.d.ts",
+      "!migrations",
       "!skills-lock.json"
     ]
   },

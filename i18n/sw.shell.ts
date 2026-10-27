@@ -21,7 +21,6 @@ export const shell: Record<keyof typeof en, string> = {
   "shell.page.today": "Leo",
   "shell.page.lock": "Weka PIN yako",
   "shell.page.setPin": "Weka PIN",
-  "shell.page.welcome": "Karibu Mazao",
 
   "shell.nav.label": "Urambazaji mkuu",
   "shell.nav.overview": "Muhtasari",
@@ -39,4 +38,34 @@ export const shell: Record<keyof typeof en, string> = {
   "shell.sync.signInToBackUp": "Ingia ili kuhifadhi",
 
   "shell.lock.title": "Weka PIN yako",
+
+  "shell.auth.signIn.title": "Ingia: Mazao",
+  "shell.auth.signUp.title": "Anza bure: Mazao",
+  "shell.auth.description":
+    "Ingia Mazao uandike mauzo, deni na gharama na kuzihifadhi.",
+  "shell.auth.photoAlt":
+    "Mama mboga kwenye kibanda chake cha mboga katika soko la Gikomba, akiangalia simu yake",
+  "shell.auth.demo": "Jaribu onyesho kwanza",
+  "shell.auth.home": "Mwanzo wa Mazao",
+
+  "shell.signIn.title": "Karibu Mazao",
+  // English until a native speaker supplies Kiswahili (Q-006, OQ P1-Q14).
+  "shell.signIn.privacy.heading": "Your data",
+  "shell.signIn.privacy.store":
+    "We keep your email and the business records you enter.",
+  "shell.signIn.privacy.eu": "Backups are stored on a secure server in the EU.",
+  "shell.signIn.privacy.pin": "Your PIN never leaves this phone.",
+  "shell.signIn.privacy.delete": "To delete your data, ask the pilot team.",
+  "shell.signIn.privacy.link": "Read the privacy notice",
+  "shell.signIn.agree": "I agree",
+  "shell.signIn.offline": "You're offline. Connect once to sign in.",
+  "shell.signIn.working": "Bringing back your records…",
+  "shell.signIn.error":
+    "Could not reach Mazao. Check your connection and try again.",
+  "shell.signIn.retry": "Try again",
+  "shell.signIn.refused.before": "This phone belongs to",
+  "shell.signIn.refused.after":
+    "Ask the owner to remove their account in Settings first.",
+  "shell.signIn.resetMismatch":
+    "That email is not the account on this phone. Use the email you signed up with.",
 };

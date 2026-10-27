@@ -1,2 +1,167 @@
 // use prisma-8
-// Mazao server data contract. Models arrive in Phase 1 (A5); see planning/DECISIONS.md D-048.
+// Mazao server data contract (blueprint A3 task 5, under D-048). The phone is the source of
+// truth; the server is the backup. Money numeric(14,2), quantities numeric(14,3). Synced tables
+// take their uuid from the phone (no default, D-018); profiles and businesses default on the server.
+
+types {
+  Money      = Numeric(14, 2)
+  Qty        = Numeric(14, 3)
+  Stamp      = TimestamptzString(3)
+  ServerUuid = Uuid @default(sql`gen_random_uuid()`)
+}
+
+model Profile {
+  id          ServerUuid @id
+  clerkUserId String     @unique @map("clerk_user_id")
+  email       String
+  fullName    String?    @map("full_name")
+  createdAt   Stamp      @default(now()) @map("created_at")
+  updatedAt   Stamp      @default(now()) @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Business {
+  id             ServerUuid @id
+  name           String     @default("")
+  businessType   String     @default("") @map("business_type")
+  marketLocation String     @default("") @map("market_location")
+  currencyCode   Char(3)    @default("KES") @map("currency_code")
+  timezone       String     @default("Africa/Nairobi")
+  createdAt      Stamp      @default(now()) @map("created_at")
+  updatedAt      Stamp      @default(now()) @map("updated_at")
+
+  @@map("businesses")
+}
+
+model BusinessMember {
+  businessId Uuid     @map("business_id")
+  profileId  Uuid     @unique @map("profile_id")
+  role       String   @default("owner")
+  createdAt  Stamp    @default(now()) @map("created_at")
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([businessId, profileId])
+  @@check(expression: sql`role IN ('owner')`, name: "business_members_role")
+  @@map("business_members")
+}
+
+model Customer {
+  id         Uuid     @id
+  businessId Uuid     @map("business_id")
+  name       String
+  phone      String?
+  notes      String?
+  isFavorite Boolean  @default(false) @map("is_favorite")
+  createdBy  Uuid     @map("created_by")
+  createdAt  Stamp    @map("created_at")
+  updatedAt  Stamp    @map("updated_at")
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, updatedAt, id])
+  @@map("customers")
+}
+
+model Supplier {
+  id         Uuid     @id
+  businessId Uuid     @map("business_id")
+  name       String
+  phone      String?
+  notes      String?
+  isFavorite Boolean  @default(false) @map("is_favorite")
+  createdBy  Uuid     @map("created_by")
+  createdAt  Stamp    @map("created_at")
+  updatedAt  Stamp    @map("updated_at")
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, updatedAt, id])
+  @@map("suppliers")
+}
+
+model Item {
+  id                Uuid     @id
+  businessId        Uuid     @map("business_id")
+  kind              String
+  name              String
+  unit              String
+  allowsFractional  Boolean  @map("allows_fractional")
+  sellingPrice      Money    @map("selling_price")
+  buyingPrice       Money    @map("buying_price")
+  lowStockThreshold Qty?     @map("low_stock_threshold")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdBy         Uuid     @map("created_by")
+  createdAt         Stamp    @map("created_at")
+  updatedAt         Stamp    @map("updated_at")
+  business          Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, updatedAt, id])
+  @@check(expression: sql`kind IN ('goods', 'service')`, name: "items_kind")
+  @@map("items")
+}
+
+// Immutable: no updated_at and no balance columns (D-018, D-019). Corrections are voids.
+model Transaction {
+  id                 Uuid        @id
+  businessId         Uuid        @map("business_id")
+  type               String
+  occurredAt         Stamp       @map("occurred_at")
+  source             String
+  paymentMethod      String?     @map("payment_method")
+  customerId         Uuid?       @map("customer_id")
+  supplierId         Uuid?       @map("supplier_id")
+  voidsTransactionId Uuid?       @map("voids_transaction_id")
+  expenseCategory    String?     @map("expense_category")
+  description        String?
+  dueDate            DateString? @map("due_date")
+  dueDateNote        String?     @map("due_date_note")
+  totalAmount        Money       @map("total_amount")
+  amountPaid         Money       @map("amount_paid")
+  externalReference  String?     @map("external_reference")
+  overrides          Jsonb       @default(sql`'[]'::jsonb`)
+  createdBy          Uuid        @map("created_by")
+  createdAt          Stamp       @map("created_at")
+  business           Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer           Customer?   @relation(fields: [customerId], references: [id])
+  supplier           Supplier?   @relation(fields: [supplierId], references: [id])
+
+  @@index([businessId, createdAt, id])
+  @@check(expression: sql`type IN ('sale', 'expense', 'customer_payment', 'opening_balance', 'stock_adjustment', 'void')`, name: "transactions_type")
+  @@check(expression: sql`source IN ('manual', 'onboarding')`, name: "transactions_source")
+  @@check(expression: sql`payment_method IS NULL OR payment_method IN ('cash', 'mpesa', 'other')`, name: "transactions_payment_method")
+  @@check(expression: sql`total_amount >= 0`, name: "transactions_total_amount")
+  @@check(expression: sql`amount_paid >= 0`, name: "transactions_amount_paid")
+  @@map("transactions")
+}
+
+model TransactionItem {
+  id            Uuid        @id
+  transactionId Uuid        @map("transaction_id")
+  businessId    Uuid        @map("business_id")
+  itemId        Uuid?       @map("item_id")
+  itemKind      String?     @map("item_kind")
+  description   String
+  quantity      Qty
+  unit          String
+  unitPrice     Money       @map("unit_price")
+  unitCost      Money       @map("unit_cost")
+  createdAt     Stamp       @map("created_at")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  business      Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, createdAt, id])
+  @@index([transactionId])
+  @@check(expression: sql`quantity <> 0`, name: "transaction_items_quantity")
+  @@check(expression: sql`item_kind IS NULL OR item_kind IN ('goods', 'service')`, name: "transaction_items_item_kind")
+  @@map("transaction_items")
+}
+
+// The operating profile, one row per business. Last write wins by updated_at (M5).
+model MerchantSettings {
+  businessId Uuid     @id @map("business_id")
+  settings   Jsonb    @default(sql`'{}'::jsonb`)
+  updatedAt  Stamp    @map("updated_at")
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@map("merchant_settings")
+}
