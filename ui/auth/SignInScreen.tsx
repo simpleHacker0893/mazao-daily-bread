@@ -106,13 +106,13 @@ export function SignInScreen({ variant }: { variant: "signIn" | "signUp" }) {
       <PageTitle title={t("shell.signIn.title", locale)} onImage />
 
       {!online ? (
-        <p role="status" className={panel}>
+        <output className={`${panel} block`}>
           {t("shell.signIn.offline", locale)}
-        </p>
+        </output>
       ) : phase.kind === "working" || phase.kind === "clearing" ? (
-        <p role="status" aria-live="polite" className={panel}>
+        <output aria-live="polite" className={`${panel} block`}>
           {t("shell.signIn.working", locale)}
-        </p>
+        </output>
       ) : phase.kind === "error" ? (
         <div role="alert" className={`${panel} flex flex-col gap-4`}>
           <p>{t("shell.signIn.error", locale)}</p>
