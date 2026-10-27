@@ -13,6 +13,32 @@ export const landing: Record<keyof typeof en, string> = {
   "landing.cta.demo": "Jaribu onyesho",
   "landing.cta.signIn": "Ingia",
 
+  "landing.demo.intro.title": "See Mazao with a real day's numbers",
+  "landing.demo.intro.description":
+    "Explore a fictional Gikomba shop's sample day. Nothing you do here is saved.",
+  "landing.demo.intro.photoAlt":
+    "Fundi wa simu akifanya kazi kwenye kibanda kidogo",
+  "landing.demo.intro.open": "Open the demo",
+  "landing.demo.banner.label": "Demo mode",
+  "landing.demo.banner.message": "Demo with sample data. Nothing is saved.",
+  "landing.demo.banner.start": "Start free",
+  "landing.demo.banner.exit": "Exit demo",
+  "landing.demo.overview.title": "Overview",
+  "landing.demo.overview.newSale": "New sale",
+  "landing.demo.overview.profit": "Net profit today",
+  "landing.demo.overview.sales": "Sales",
+  "landing.demo.overview.cost": "Cost of goods",
+  "landing.demo.overview.expenses": "Expenses",
+  "landing.demo.overview.moneyIn": "Money in",
+  "landing.demo.overview.cash": "Cash",
+  "landing.demo.overview.mpesa": "M-Pesa",
+  "landing.demo.overview.givenOnDeni": "Given on deni today",
+  "landing.demo.overview.recentSales": "Today's sales",
+  "landing.demo.save.title": "Demo only",
+  "landing.demo.save.body":
+    "This is a demo. Start free to record your own sales.",
+  "landing.demo.save.close": "Close",
+
   "landing.hero.title": "Jua faida yako halisi.",
   "landing.hero.body":
     "Andika mauzo na deni, na uone ulichobaki nacho leo baada ya gharama. Inafanya kazi hata bila mtandao.",

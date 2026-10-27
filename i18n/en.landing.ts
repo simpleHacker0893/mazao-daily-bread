@@ -11,6 +11,33 @@ export const landing = {
   "landing.cta.demo": "Try the demo",
   "landing.cta.signIn": "Sign in",
 
+  // Public demo (D-051); fixture values are fictional and never persisted.
+  "landing.demo.intro.title": "See Mazao with a real day's numbers",
+  "landing.demo.intro.description":
+    "Explore a fictional Gikomba shop's sample day. Nothing you do here is saved.",
+  "landing.demo.intro.photoAlt":
+    "A phone repair fundi working at a small kiosk",
+  "landing.demo.intro.open": "Open the demo",
+  "landing.demo.banner.label": "Demo mode",
+  "landing.demo.banner.message": "Demo with sample data. Nothing is saved.",
+  "landing.demo.banner.start": "Start free",
+  "landing.demo.banner.exit": "Exit demo",
+  "landing.demo.overview.title": "Overview",
+  "landing.demo.overview.newSale": "New sale",
+  "landing.demo.overview.profit": "Net profit today",
+  "landing.demo.overview.sales": "Sales",
+  "landing.demo.overview.cost": "Cost of goods",
+  "landing.demo.overview.expenses": "Expenses",
+  "landing.demo.overview.moneyIn": "Money in",
+  "landing.demo.overview.cash": "Cash",
+  "landing.demo.overview.mpesa": "M-Pesa",
+  "landing.demo.overview.givenOnDeni": "Given on deni today",
+  "landing.demo.overview.recentSales": "Today's sales",
+  "landing.demo.save.title": "Demo only",
+  "landing.demo.save.body":
+    "This is a demo. Start free to record your own sales.",
+  "landing.demo.save.close": "Close",
+
   "landing.hero.title": "Know your real profit.",
   "landing.hero.body":
     "Record sales and deni, and see what you kept today after costs. It works even with no network.",
