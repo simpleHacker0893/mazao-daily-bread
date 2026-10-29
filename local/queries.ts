@@ -6,11 +6,21 @@ import { useSession } from "@/auth/session";
 import { isInRange, nairobiDayRange, todayInNairobi } from "@/domain/dates";
 import {
   activeTxns,
+  broughtForwardStock,
+  broughtForwardTotals,
+  canVoid,
   customerBalance,
   customerLedger,
+  customerLedgerRows,
+  customerStanding,
+  deniList,
   isOverdue,
+  paymentPreview,
+  paymentQuickAmounts,
+  saleOutstandingBalance,
   stockOnHand,
 } from "@/domain/ledger";
+import type { OnboardingProgress } from "@/domain/onboarding";
 import {
   defaultProfile,
   type OperatingProfile,
@@ -23,9 +33,12 @@ import type {
   Id,
   IsoTime,
   Item,
+  Supplier,
   Txn,
+  TxnLine,
 } from "@/domain/types";
 import { type BusinessDb, getBusinessDb } from "./business-db";
+import { readOnboardingProgress } from "./onboarding-progress";
 
 /** The signed-in business's database, or null while locked or signed out. */
 export function useBusinessDb(): BusinessDb | null {
@@ -68,6 +81,12 @@ async function everything(db: BusinessDb) {
 
 export type ListedTxn = Txn & { voided: boolean };
 
+export type ListedSaleLine = TxnLine & { label: string };
+export type ListedSale = ListedTxn & {
+  lines: ListedSaleLine[];
+  outstandingBalance: Cents;
+};
+
 function withVoided(list: Txn[], all: Txn[]): ListedTxn[] {
   const voided = new Set(
     all.flatMap((t) =>
@@ -99,6 +118,37 @@ export function useTodaySales(): ListedTxn[] | undefined {
   return useTodayOfType("sale");
 }
 
+/** Today's sales with display labels; void rows remain represented on their original sale. */
+export function useTodaySalesWithLines(): ListedSale[] | undefined {
+  const today = useToday();
+  return useBusinessQuery(
+    async (db) => {
+      const { items, txns, lines } = await everything(db);
+      const range = nairobiDayRange(today);
+      const itemNames = new Map(items.map((item) => [item.id, item.name]));
+      return withVoided(
+        txns.filter(
+          (txn) => txn.type === "sale" && isInRange(txn.occurredAt, range),
+        ),
+        txns,
+      ).map((sale) => ({
+        ...sale,
+        outstandingBalance: saleOutstandingBalance(sale),
+        lines: lines
+          .filter((line) => line.txnId === sale.id)
+          .map((line) => ({
+            ...line,
+            label:
+              line.description ||
+              (line.itemId && itemNames.get(line.itemId)) ||
+              "",
+          })),
+      }));
+    },
+    [today],
+  );
+}
+
 /** Today's expenses, newest first, each marked if voided. */
 export function useTodayExpenses(): ListedTxn[] | undefined {
   return useTodayOfType("expense");
@@ -109,6 +159,47 @@ export type CustomerWithBalance = {
   balance: Cents;
   overdue: boolean;
 };
+
+export type DeniListData = ReturnType<typeof deniList>;
+
+/** Customer deni totals and overdue-first rows, computed by the ledger domain. */
+export function useDeniList(day: Day): DeniListData | undefined {
+  return useBusinessQuery(
+    async (db) => {
+      const [customers, txns] = await Promise.all([
+        db.customers.toArray(),
+        db.txns.toArray(),
+      ]);
+      return deniList(customers, txns, day);
+    },
+    [day],
+  );
+}
+
+/** All customers for pickers, including customers with no current balance. */
+export function useCustomers(): Customer[] | undefined {
+  return useBusinessQuery(
+    async (db) =>
+      (await db.customers.toArray()).sort((a, b) =>
+        a.name.localeCompare(b.name),
+      ),
+    [],
+  );
+}
+
+/** Suppliers whose names contain the query, case-insensitively. */
+export function useSupplierSearch(query: string): Supplier[] | undefined {
+  const search = query.trim().toLocaleLowerCase();
+  return useBusinessQuery(
+    async (db) =>
+      (await db.suppliers.toArray())
+        .filter((supplier) =>
+          supplier.name.toLocaleLowerCase().includes(search),
+        )
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [search],
+  );
+}
 
 /** Customers with what they owe; overdue first, then the biggest balance. */
 export function useCustomersWithBalance(): CustomerWithBalance[] | undefined {
@@ -139,6 +230,165 @@ export function useCustomerLedger(id: Id): Txn[] | undefined {
   return useBusinessQuery(
     async (db) => customerLedger(id, await db.txns.toArray()),
     [id],
+  );
+}
+
+export type CustomerLedgerEntry = ReturnType<
+  typeof customerLedgerRows
+>[number] & {
+  txn: Txn;
+  lineSummary: string | undefined;
+};
+
+/** Customer ledger rows with their source records and display-only line labels. */
+export function useCustomerLedgerRows(
+  id: Id,
+): CustomerLedgerEntry[] | undefined {
+  return useBusinessQuery(
+    async (db) => {
+      const [txns, lines] = await Promise.all([
+        db.txns.toArray(),
+        db.lines.toArray(),
+      ]);
+      const txnById = new Map(txns.map((txn) => [txn.id, txn]));
+      return customerLedgerRows(id, txns).flatMap((row) => {
+        const txn = txnById.get(row.txnId);
+        if (!txn) return [];
+        const summary = lines
+          .filter((line) => line.txnId === txn.id)
+          .map((line) => line.description)
+          .filter(Boolean)
+          .join(", ");
+        return [
+          {
+            ...row,
+            txn,
+            lineSummary: summary || undefined,
+          },
+        ];
+      });
+    },
+    [id],
+  );
+}
+
+export type CustomerStandingData = {
+  customer: Customer | undefined;
+  standing: ReturnType<typeof customerStanding>;
+  overdue: boolean;
+};
+
+/** The current amount owed/credit and overdue flag for one customer. */
+export function useCustomerStanding(id: Id): CustomerStandingData | undefined {
+  const today = useToday();
+  return useBusinessQuery(
+    async (db) => {
+      const [customer, txns] = await Promise.all([
+        db.customers.get(id),
+        db.txns.toArray(),
+      ]);
+      return {
+        customer,
+        standing: customerStanding(customerBalance(id, txns)),
+        overdue: isOverdue(id, txns, today),
+      };
+    },
+    [id, today],
+  );
+}
+
+export type TxnDetail = {
+  txn: Txn;
+  voided: boolean;
+  canVoid: boolean;
+  outstandingBalance: Cents;
+  customerName: string | undefined;
+  voidedTxn: Txn | undefined;
+  lines: ListedSaleLine[];
+};
+
+/** Full local detail for any transaction type, including its void target and sale lines. */
+export function useTxnDetail(id: Id): TxnDetail | null | undefined {
+  return useBusinessQuery(
+    async (db) => {
+      const [txn, txns, customers, items, lines] = await Promise.all([
+        db.txns.get(id),
+        db.txns.toArray(),
+        db.customers.toArray(),
+        db.items.toArray(),
+        db.lines.toArray(),
+      ]);
+      if (!txn) return null;
+
+      const customerById = new Map(
+        customers.map((customer) => [customer.id, customer.name]),
+      );
+      const itemById = new Map(items.map((item) => [item.id, item.name]));
+      const voidedIds = new Set(
+        txns.flatMap((record) =>
+          record.type === "void" && record.voidsTxnId
+            ? [record.voidsTxnId]
+            : [],
+        ),
+      );
+      return {
+        txn,
+        voided: voidedIds.has(txn.id),
+        canVoid: canVoid(txn, txns),
+        outstandingBalance: saleOutstandingBalance(txn),
+        customerName: txn.customerId
+          ? customerById.get(txn.customerId)
+          : undefined,
+        voidedTxn:
+          txn.type === "void" && txn.voidsTxnId
+            ? txns.find((record) => record.id === txn.voidsTxnId)
+            : undefined,
+        lines: lines
+          .filter((line) => line.txnId === txn.id)
+          .map((line) => ({
+            ...line,
+            label:
+              line.description ||
+              (line.itemId && itemById.get(line.itemId)) ||
+              "",
+          })),
+      };
+    },
+    [id],
+  );
+}
+
+export type PaymentPreview = {
+  customer: Customer | undefined;
+  balance: Cents;
+  quick: ReturnType<typeof paymentQuickAmounts>;
+  preview: ReturnType<typeof paymentPreview>;
+  nextStanding: ReturnType<typeof customerStanding>;
+};
+
+/** Payment preview and round amounts; all monetary calculations stay in domain/ledger. */
+export function usePaymentPreview(
+  customerId: Id | undefined,
+  amount: Cents,
+): PaymentPreview | undefined {
+  return useBusinessQuery(
+    async (db) => {
+      if (!customerId) return undefined;
+      const [customer, txns] = await Promise.all([
+        db.customers.get(customerId),
+        db.txns.toArray(),
+      ]);
+      const balance = customerBalance(customerId, txns);
+      const preview = paymentPreview(balance, amount);
+      return {
+        customer,
+        balance,
+        quick: paymentQuickAmounts(balance),
+        preview,
+        nextStanding: customerStanding(preview.newBalance),
+      };
+    },
+    [customerId, amount],
   );
 }
 
@@ -216,6 +466,77 @@ export function useOperatingProfile(): OperatingProfile | undefined {
       (await db.settings.get("operatingProfile"))?.value ?? defaultProfile(),
     [],
   );
+}
+
+/** Local-only draft progress; null means loaded with no saved draft, undefined means loading. */
+export function useOnboardingProgress(): OnboardingProgress | null | undefined {
+  const db = useBusinessDb();
+  return useLiveQuery(
+    async () => (db ? ((await readOnboardingProgress(db)) ?? null) : undefined),
+    [db],
+    undefined,
+  );
+}
+
+export type BroughtForwardEntry = ListedTxn & { partyName?: string };
+export type BroughtForwardStockEntry = { item: Item; quantity: number };
+export type BroughtForwardData = {
+  customers: BroughtForwardEntry[];
+  suppliers: BroughtForwardEntry[];
+  totals: { customers: Cents; suppliers: Cents };
+  stock: BroughtForwardStockEntry[];
+};
+
+/** Notebook entries, totals, and opening stock, all derived from the local ledger. */
+export function useBroughtForward(): BroughtForwardData | undefined {
+  return useBusinessQuery(async (db) => {
+    const [customers, suppliers, items, txns, lines] = await Promise.all([
+      db.customers.toArray(),
+      db.suppliers.toArray(),
+      db.items.toArray(),
+      db.txns.toArray(),
+      db.lines.toArray(),
+    ]);
+    const customerNames = new Map(
+      customers.map((party) => [party.id, party.name]),
+    );
+    const supplierNames = new Map(
+      suppliers.map((party) => [party.id, party.name]),
+    );
+    const openingBalances = txns.filter(
+      (txn) => txn.type === "opening_balance" && txn.source === "onboarding",
+    );
+    const stockByItem = broughtForwardStock(txns, lines);
+
+    return {
+      customers: withVoided(
+        openingBalances.filter((txn) => txn.customerId !== undefined),
+        txns,
+      ).map((txn) => ({
+        ...txn,
+        partyName: txn.customerId
+          ? customerNames.get(txn.customerId)
+          : undefined,
+      })),
+      suppliers: withVoided(
+        openingBalances.filter((txn) => txn.supplierId !== undefined),
+        txns,
+      ).map((txn) => ({
+        ...txn,
+        partyName: txn.supplierId
+          ? supplierNames.get(txn.supplierId)
+          : undefined,
+      })),
+      totals: broughtForwardTotals(txns),
+      stock: items
+        .filter((item) => item.kind === "goods")
+        .map((item) => ({
+          item,
+          quantity: stockByItem.get(item.id) ?? 0,
+        }))
+        .sort((a, b) => a.item.name.localeCompare(b.item.name)),
+    };
+  }, []);
 }
 
 /** Unsynced records: queue entries whose table is not `lines`, so a sale counts once (AC-16). */

@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
   activeTxns,
+  broughtForwardStock,
+  broughtForwardTotal,
+  broughtForwardTotals,
   canVoid,
   customerBalance,
   customerLedger,
+  customerLedgerRows,
+  customerStanding,
+  deniList,
   isOverdue,
   openDeni,
+  paymentPreview,
+  paymentQuickAmounts,
+  saleOutstandingBalance,
   stockOnHand,
   supplierOwed,
 } from "./ledger";
@@ -22,6 +31,169 @@ describe("Wanjiku's deni (blueprint B1 scenario)", () => {
     amountPaid: 10000,
     paymentMethod: "cash",
   });
+
+  describe("customer balance presentation helpers", () => {
+    it("labels positive, zero, and negative balances without changing their meaning", () => {
+      expect(customerStanding(12500)).toEqual({ kind: "owes", amount: 12500 });
+      expect(customerStanding(0)).toEqual({ kind: "clear", amount: 0 });
+      expect(customerStanding(-5000)).toEqual({ kind: "credit", amount: 5000 });
+    });
+
+    it("previews payment remainder and overpayment credit", () => {
+      expect(paymentPreview(20000, 5000)).toEqual({
+        newBalance: 15000,
+        creditCreated: 0,
+      });
+      expect(paymentPreview(20000, 25000)).toEqual({
+        newBalance: -5000,
+        creditCreated: 5000,
+      });
+      expect(paymentPreview(-3000, 1000)).toEqual({
+        newBalance: -4000,
+        creditCreated: 1000,
+      });
+    });
+
+    it("offers all and up to three lower round-payment amounts", () => {
+      expect(paymentQuickAmounts(100000)).toEqual({
+        all: 100000,
+        rounds: [90000, 80000, 70000],
+      });
+      expect(paymentQuickAmounts(10000)).toEqual({ all: 10000, rounds: [] });
+      expect(paymentQuickAmounts(0)).toEqual({ all: null, rounds: [] });
+      expect(paymentQuickAmounts(-1)).toEqual({ all: null, rounds: [] });
+    });
+  });
+
+  describe("deniList", () => {
+    const customers = [
+      {
+        id: WANJIKU,
+        businessId: "business",
+        name: "Wanjiku",
+        isFavorite: false,
+        createdBy: "user",
+        createdAt: at(0),
+        updatedAt: at(0),
+      },
+      {
+        id: OTIENO,
+        businessId: "business",
+        name: "Otieno",
+        isFavorite: false,
+        createdBy: "user",
+        createdAt: at(0),
+        updatedAt: at(0),
+      },
+    ];
+
+    it("totals only the remaining overdue amount and sorts overdue customers first", () => {
+      const overdueSale = txn({
+        type: "sale",
+        customerId: WANJIKU,
+        totalAmount: 10000,
+        dueDate: "2026-10-20",
+        occurredAt: at(0),
+      });
+      const laterSale = txn({
+        type: "sale",
+        customerId: WANJIKU,
+        totalAmount: 8000,
+        dueDate: "2026-10-28",
+        occurredAt: at(5),
+      });
+      const partialPayment = txn({
+        type: "customer_payment",
+        customerId: WANJIKU,
+        totalAmount: 5000,
+        amountPaid: 5000,
+        occurredAt: at(10),
+      });
+      const noDueDateSale = txn({
+        type: "sale",
+        customerId: OTIENO,
+        totalAmount: 20000,
+        occurredAt: at(15),
+      });
+
+      expect(
+        deniList(
+          customers,
+          [overdueSale, laterSale, partialPayment, noDueDateSale],
+          "2026-10-26",
+        ),
+      ).toEqual({
+        totalOutstanding: 33000,
+        overdueTotal: 5000,
+        rows: [
+          {
+            customerId: WANJIKU,
+            name: "Wanjiku",
+            balance: 13000,
+            earliestDue: "2026-10-20",
+            overdue: true,
+          },
+          {
+            customerId: OTIENO,
+            name: "Otieno",
+            balance: 20000,
+            earliestDue: null,
+            overdue: false,
+          },
+        ],
+      });
+    });
+
+    it("excludes voided credits from balances and overdue totals", () => {
+      const sale = txn({
+        type: "sale",
+        customerId: WANJIKU,
+        totalAmount: 10000,
+        dueDate: "2026-10-20",
+      });
+      expect(deniList(customers, [sale, voidOf(sale)], "2026-10-26")).toEqual({
+        totalOutstanding: 0,
+        overdueTotal: 0,
+        rows: [],
+      });
+    });
+  });
+
+  describe("customerLedgerRows", () => {
+    it("reconciles running balances chronologically and neutralizes a void and its original", () => {
+      const sale = txn({
+        type: "sale",
+        customerId: WANJIKU,
+        totalAmount: 30000,
+        amountPaid: 10000,
+        occurredAt: at(0),
+      });
+      const payment = txn({
+        type: "customer_payment",
+        customerId: WANJIKU,
+        totalAmount: 5000,
+        amountPaid: 5000,
+        occurredAt: at(10),
+      });
+      const voidedPayment = voidOf(payment, 20);
+      const rows = customerLedgerRows(WANJIKU, [sale, payment, voidedPayment]);
+
+      expect(rows.map((row) => row.txnId)).toEqual([
+        voidedPayment.id,
+        payment.id,
+        sale.id,
+      ]);
+      expect(rows.map((row) => row.delta)).toEqual([0, 0, 20000]);
+      expect(rows.map((row) => row.runningBalance)).toEqual([
+        20000, 20000, 20000,
+      ]);
+      expect(rows.map((row) => row.voided)).toEqual([true, true, false]);
+      expect(rows.at(-1)?.runningBalance).toBe(
+        customerBalance(WANJIKU, [sale, payment, voidedPayment]),
+      );
+      expect(rows[0]?.amount).toBe(0);
+    });
+  });
   const payment = txn({
     type: "customer_payment",
     customerId: WANJIKU,
@@ -34,6 +206,17 @@ describe("Wanjiku's deni (blueprint B1 scenario)", () => {
 
   it("buys 300 and pays 100: owes 200", () => {
     expect(customerBalance(WANJIKU, [sale])).toBe(20000);
+  });
+
+  it("derives an individual sale's unpaid remainder in cents", () => {
+    expect(saleOutstandingBalance(sale)).toBe(20000);
+    expect(
+      saleOutstandingBalance({ ...sale, amountPaid: sale.totalAmount }),
+    ).toBe(0);
+    expect(
+      saleOutstandingBalance({ ...sale, amountPaid: sale.totalAmount + 1 }),
+    ).toBe(0);
+    expect(saleOutstandingBalance({ ...sale, type: "expense" })).toBe(0);
   });
 
   it("pays 150 more: owes 50", () => {
@@ -80,6 +263,66 @@ describe("opening balances", () => {
     expect(
       supplierOwed("kamau", [owed, other, cancelled, voidOf(cancelled)]),
     ).toBe(80000);
+  });
+
+  it("totals active brought-forward customer and supplier balances separately", () => {
+    const customer = txn({
+      type: "opening_balance",
+      customerId: OTIENO,
+      totalAmount: 50000,
+      source: "onboarding",
+    });
+    const supplier = txn({
+      type: "opening_balance",
+      supplierId: "kamau",
+      totalAmount: 80000,
+      source: "onboarding",
+    });
+    const manual = txn({
+      type: "opening_balance",
+      customerId: OTIENO,
+      totalAmount: 30000,
+      source: "manual",
+    });
+
+    expect(
+      broughtForwardTotal("customer", [customer, voidOf(customer), manual]),
+    ).toBe(0);
+    expect(broughtForwardTotal("supplier", [supplier])).toBe(80000);
+    expect(broughtForwardTotals([customer, supplier])).toEqual({
+      customers: 50000,
+      suppliers: 80000,
+    });
+  });
+
+  it("totals only active onboarding stock lines for goods items", () => {
+    const stockTxn = txn({
+      type: "stock_adjustment",
+      source: "onboarding",
+    });
+    const manualTxn = txn({
+      type: "stock_adjustment",
+      source: "manual",
+    });
+    const stockLines = [
+      line({ txnId: stockTxn.id, itemId: "mayai", quantity: 3 }),
+      line({ txnId: stockTxn.id, itemId: "mayai", quantity: 0.1 }),
+      line({ txnId: stockTxn.id, itemId: "mayai", quantity: 0.2 }),
+      line({ txnId: manualTxn.id, itemId: "mayai", quantity: 10 }),
+      line({
+        txnId: stockTxn.id,
+        itemId: "trip",
+        itemKind: "service",
+        quantity: 5,
+      }),
+    ];
+
+    expect(
+      broughtForwardStock([stockTxn, voidOf(stockTxn), manualTxn], stockLines),
+    ).toEqual(new Map());
+    expect(broughtForwardStock([stockTxn, manualTxn], stockLines)).toEqual(
+      new Map([["mayai", 3.3]]),
+    );
   });
 });
 

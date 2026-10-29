@@ -8,6 +8,10 @@ import contractJson from "@/prisma/contract.json";
 
 export const contract = contractFromJson<Contract>(contractJson);
 
+if (process.env.NODE_ENV === "development") {
+  console.info("Database URL configured:", Boolean(process.env.DATABASE_URL));
+}
+
 function createDb() {
   return postgres({ contract, url: process.env.DATABASE_URL });
 }

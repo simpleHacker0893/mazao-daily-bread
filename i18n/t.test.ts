@@ -3,7 +3,7 @@ import { navKeys, t } from "@/i18n/t";
 
 describe("t()", () => {
   it("defaults to English and resolves a key from the shell half", () => {
-    expect(t("shell.lock.title")).toBe("Enter your PIN");
+    expect(t("shell.lock.title")).toBe("Unlock Mazao");
   });
 
   it("resolves a key from the ledger half", () => {
@@ -11,7 +11,7 @@ describe("t()", () => {
   });
 
   it("switches to Kiswahili when asked", () => {
-    expect(t("shell.lock.title", "sw")).toBe("Weka PIN yako");
+    expect(t("shell.lock.title", "sw")).toBe("Fungua Mazao");
     expect(t("ledger.sale.save", "sw")).toBe("Hifadhi mauzo");
   });
 });

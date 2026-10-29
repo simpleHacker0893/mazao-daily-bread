@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatKES, fromCents, lineTotal, toCents } from "./money";
+import {
+  formatKES,
+  fromCents,
+  linesTotal,
+  lineTotal,
+  saleDraftTotals,
+  toCents,
+} from "./money";
 
 describe("toCents / fromCents", () => {
   it("converts shillings to integer cents", () => {
@@ -37,5 +44,33 @@ describe("lineTotal", () => {
     expect(lineTotal(0.5, 12000)).toBe(6000);
     expect(lineTotal(3, 5000)).toBe(15000);
     expect(lineTotal(0.333, 100)).toBe(33);
+  });
+});
+
+describe("linesTotal", () => {
+  it("adds individually rounded line totals", () => {
+    expect(
+      linesTotal([
+        { quantity: 0.333, unitPrice: 100 },
+        { quantity: 1, unitPrice: 100 },
+      ]),
+    ).toBe(133);
+  });
+});
+
+describe("saleDraftTotals", () => {
+  it("uses rounded line values and returns the outstanding deni", () => {
+    expect(
+      saleDraftTotals(
+        [
+          { quantity: 3, unitPrice: 5000 },
+          { quantity: 0.5, unitPrice: 12000 },
+        ],
+        10000,
+      ),
+    ).toEqual({ lineTotals: [15000, 6000], total: 21000, deni: 11000 });
+    expect(saleDraftTotals([{ quantity: 1, unitPrice: 5000 }], 6000).deni).toBe(
+      0,
+    );
   });
 });
