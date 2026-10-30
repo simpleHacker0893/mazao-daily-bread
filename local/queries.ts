@@ -25,7 +25,14 @@ import {
   defaultProfile,
   type OperatingProfile,
 } from "@/domain/operating-profile";
-import { type DaySummary, daySummary } from "@/domain/summary";
+import {
+  type DayReport,
+  type DaySummary,
+  dayReport,
+  daySummary,
+  moneyInShares,
+  supplierDeniTotal,
+} from "@/domain/summary";
 import type {
   Cents,
   Customer,
@@ -457,6 +464,96 @@ export function useLowStock(): ItemWithStock[] | undefined {
       item.lowStockThreshold !== null &&
       onHand <= item.lowStockThreshold,
   );
+}
+
+/** Today's itemised report. `totals` is `daySummary` for the same day, never a second calculation. */
+export function useDayReport(today: Day): DayReport | undefined {
+  return useBusinessQuery(
+    async (db) => {
+      const [customers, txns, lines] = await Promise.all([
+        db.customers.toArray(),
+        db.txns.toArray(),
+        db.lines.toArray(),
+      ]);
+      return dayReport(txns, lines, customers, nairobiDayRange(today));
+    },
+    [today],
+  );
+}
+
+export type DashboardLowStock = {
+  itemId: Id;
+  name: string;
+  unit: string;
+  onHand: number;
+};
+
+export type Dashboard = {
+  /** Identical to `useDayReport(today).totals`. */
+  totals: DaySummary;
+  /** Cash, M-Pesa and other as fractions of money in. */
+  moneyIn: { cash: number; mpesa: number; other: number };
+  deniGiven: Cents;
+  /** The screen shows `rows.slice(0, 5)`. */
+  deni: DeniListData;
+  supplierDeniTotal: Cents;
+  lowStock: DashboardLowStock[];
+  /** Records counted in today's totals (sales, expenses and payments received). */
+  recordCount: number;
+};
+
+/** Everything Muhtasari shows, from one read of the local ledger. */
+export function useDashboard(today: Day): Dashboard | undefined {
+  return useBusinessQuery(
+    async (db) => {
+      const [customers, suppliers, items, txns, lines] = await Promise.all([
+        db.customers.toArray(),
+        db.suppliers.toArray(),
+        db.items.toArray(),
+        db.txns.toArray(),
+        db.lines.toArray(),
+      ]);
+      const report = dayReport(txns, lines, customers, nairobiDayRange(today));
+      return {
+        totals: report.totals,
+        moneyIn: moneyInShares(report.totals),
+        deniGiven: report.deniGiven,
+        deni: deniList(customers, txns, today),
+        supplierDeniTotal: supplierDeniTotal(suppliers, txns),
+        lowStock: items
+          .filter((item) => item.isActive && item.kind === "goods")
+          .map((item) => ({
+            itemId: item.id,
+            name: item.name,
+            unit: item.unit,
+            threshold: item.lowStockThreshold,
+            onHand: stockOnHand(item.id, txns, lines),
+          }))
+          .filter(
+            (row) => row.threshold !== null && row.onHand <= row.threshold,
+          )
+          .map(({ itemId, name, unit, onHand }) => ({
+            itemId,
+            name,
+            unit,
+            onHand,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+        recordCount: report.entries.filter((e) => e.countsInTotals).length,
+      };
+    },
+    [today],
+  );
+}
+
+/** The business name and place from the saved profile; empty strings until onboarding saves them. */
+export function useBusinessHeader():
+  | { businessName: string; location: string }
+  | undefined {
+  const profile = useOperatingProfile();
+  return profile
+    ? { businessName: profile.businessName, location: profile.location }
+    : undefined;
 }
 
 /** The saved operating profile, or the default until onboarding saves one. */

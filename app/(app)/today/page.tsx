@@ -1,12 +1,11 @@
 "use client";
 
-import { t } from "@/i18n/t";
-import { PageTitle } from "@/ui/PageTitle";
+import { Leo } from "@/ui/today/Leo";
 
 export default function TodayPage() {
   return (
     <div className="p-4">
-      <PageTitle title={t("shell.page.today")} />
+      <Leo />
     </div>
   );
 }
