@@ -1,14 +1,16 @@
 import type { z } from "zod";
 import type { MessageKey } from "@/i18n/t";
-import { activeTxns, stockOnHand } from "./ledger";
+import { activeTxns, stockOnHand, supplierOwed } from "./ledger";
 import { lineTotal } from "./money";
 import type { OperatingProfile, RuleLevel } from "./operating-profile";
 import {
   DraftExpenseSchema,
   DraftOpeningSchema,
   DraftPaymentSchema,
+  DraftPurchaseSchema,
   DraftSaleSchema,
   DraftStockAdjustmentSchema,
+  DraftSupplierPaymentSchema,
   IdSchema,
 } from "./schemas";
 import type {
@@ -16,8 +18,10 @@ import type {
   DraftExpense,
   DraftOpening,
   DraftPayment,
+  DraftPurchase,
   DraftSale,
   DraftStockAdjustment,
+  DraftSupplierPayment,
   Id,
   Item,
   Txn,
@@ -32,10 +36,13 @@ export type IssueCode =
   | "ARITHMETIC"
   | "PAID_EXCEEDS_TOTAL"
   | "DENI_NEEDS_CUSTOMER"
+  | "DENI_NEEDS_SUPPLIER"
   | "NEGATIVE_STOCK"
   | "BELOW_COST"
   | "PRICE_VARIANCE"
-  | "POSSIBLE_DUPLICATE";
+  | "BUYING_PRICE_CHANGED"
+  | "POSSIBLE_DUPLICATE"
+  | "SUPPLIER_OVERPAID";
 
 export type Issue = {
   code: IssueCode;
@@ -50,7 +57,9 @@ export type GrillInput =
   | { type: "customer_payment"; draft: DraftPayment }
   | { type: "opening_balance"; draft: DraftOpening }
   | { type: "stock_adjustment"; draft: DraftStockAdjustment }
-  | { type: "void"; draft: { txnId: Id } };
+  | { type: "void"; draft: { txnId: Id } }
+  | { type: "purchase"; draft: DraftPurchase }
+  | { type: "supplier_payment"; draft: DraftSupplierPayment };
 
 export type GrillContext = {
   items: readonly Item[];
@@ -72,10 +81,13 @@ const messageKeys: Record<IssueCode, MessageKey> = {
   ARITHMETIC: "ledger.grill.arithmetic",
   PAID_EXCEEDS_TOTAL: "ledger.grill.paidExceedsTotal",
   DENI_NEEDS_CUSTOMER: "ledger.grill.deniNeedsCustomer",
+  DENI_NEEDS_SUPPLIER: "ledger.grill.deniNeedsSupplier",
   NEGATIVE_STOCK: "ledger.grill.negativeStock",
   BELOW_COST: "ledger.grill.belowCost",
   PRICE_VARIANCE: "ledger.grill.priceVariance",
+  BUYING_PRICE_CHANGED: "ledger.grill.buyingPriceChanged",
   POSSIBLE_DUPLICATE: "ledger.grill.possibleDuplicate",
+  SUPPLIER_OVERPAID: "ledger.grill.supplierOverpaid",
 };
 
 const DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
@@ -87,6 +99,8 @@ const schemas: Record<GrillInput["type"], z.ZodType> = {
   opening_balance: DraftOpeningSchema,
   stock_adjustment: DraftStockAdjustmentSchema,
   void: IdSchema,
+  purchase: DraftPurchaseSchema,
+  supplier_payment: DraftSupplierPaymentSchema,
 };
 
 function issue(
@@ -111,6 +125,10 @@ export function runGrill(input: GrillInput, ctx: GrillContext): GrillResult {
   switch (input.type) {
     case "sale":
       return grillSale(input.draft, ctx);
+    case "purchase":
+      return grillPurchase(input.draft, ctx);
+    case "supplier_payment":
+      return grillSupplierPayment(input.draft, ctx);
     case "customer_payment": {
       const { customerId, amount } = input.draft;
       return {
@@ -131,8 +149,6 @@ export function runGrill(input: GrillInput, ctx: GrillContext): GrillResult {
         issues: party ? duplicate(ctx, "opening_balance", party, d.amount) : [],
       };
     }
-    // R0 stock adjustments are positive only (the schema refuses the rest), so NEGATIVE_STOCK
-    // cannot fire on them; expenses have no party to repeat; voids are checked by canVoid.
     case "stock_adjustment":
     case "expense":
     case "void":
@@ -201,6 +217,85 @@ function grillSale(draft: DraftSale, ctx: GrillContext): GrillResult {
       ),
     );
   }
+  return { hardErrors, issues };
+}
+
+function grillPurchase(draft: DraftPurchase, ctx: GrillContext): GrillResult {
+  const hardErrors: Issue[] = [];
+  const linesTotal = draft.lines.reduce(
+    (sum, l) => sum + lineTotal(l.quantity, l.unitPrice),
+    0,
+  );
+  if (linesTotal !== draft.totalAmount) {
+    hardErrors.push(issue("ARITHMETIC", "block"));
+  }
+  if (draft.amountPaid > draft.totalAmount) {
+    hardErrors.push(issue("PAID_EXCEEDS_TOTAL", "block"));
+  }
+  const isDeni = draft.amountPaid < draft.totalAmount;
+  if (isDeni && !draft.supplierId && !draft.newSupplier) {
+    hardErrors.push(issue("DENI_NEEDS_SUPPLIER", "block"));
+  }
+
+  const { rules } = ctx.profile;
+  const items = new Map(ctx.items.map((i) => [i.id, i]));
+  const issues: Issue[] = [];
+
+  draft.lines.forEach((l, index) => {
+    const item = l.itemId ? items.get(l.itemId) : undefined;
+    if (!item) return;
+
+    // Purchase lines are goods only (per DraftPurchase type)
+    if (item.kind === "goods") {
+      // Check if buying price changed
+      if (item.buyingPrice > 0) {
+        const variancePct =
+          (Math.abs(l.unitPrice - item.buyingPrice) / item.buyingPrice) * 100;
+        if (variancePct > rules.buyingPriceChange.thresholdPct) {
+          issues.push(
+            issue("BUYING_PRICE_CHANGED", rules.buyingPriceChange.mode, index),
+          );
+        }
+      }
+    }
+  });
+
+  if (draft.supplierId) {
+    issues.push(
+      ...duplicate(
+        ctx,
+        "purchase",
+        { supplierId: draft.supplierId },
+        draft.totalAmount,
+      ),
+    );
+  }
+  return { hardErrors, issues };
+}
+
+function grillSupplierPayment(
+  draft: DraftSupplierPayment,
+  ctx: GrillContext,
+): GrillResult {
+  const hardErrors: Issue[] = [];
+  const issues: Issue[] = [];
+
+  // Check for SUPPLIER_OVERPAID
+  const owed = supplierOwed(draft.supplierId, ctx.txns);
+  if (draft.amount > owed) {
+    issues.push(issue("SUPPLIER_OVERPAID", "warn"));
+  }
+
+  // Check for POSSIBLE_DUPLICATE
+  issues.push(
+    ...duplicate(
+      ctx,
+      "supplier_payment",
+      { supplierId: draft.supplierId },
+      draft.amount,
+    ),
+  );
+
   return { hardErrors, issues };
 }
 

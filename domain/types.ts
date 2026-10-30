@@ -25,7 +25,9 @@ export type TxnType =
   | "customer_payment"
   | "opening_balance"
   | "stock_adjustment"
-  | "void";
+  | "void"
+  | "purchase"
+  | "supplier_payment";
 
 export type Item = {
   id: Id;
@@ -161,4 +163,23 @@ export type DraftStockAdjustment = {
   itemId: Id;
   quantity: number;
   source: TxnSource;
+};
+
+export type DraftPurchase = {
+  lines: { itemId: Id; quantity: number; unit: string; unitPrice: Cents }[]; // goods only
+  totalAmount: Cents;
+  amountPaid: Cents;
+  paymentMethod: PaymentMethod | null;
+  supplierId?: Id;
+  newSupplier?: NewParty;
+  dueDate?: Day;
+  dueDateNote?: string;
+  description?: string;
+};
+
+export type DraftSupplierPayment = {
+  supplierId: Id;
+  amount: Cents;
+  paymentMethod: PaymentMethod;
+  externalReference?: string;
 };

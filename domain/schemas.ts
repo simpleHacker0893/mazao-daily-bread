@@ -6,8 +6,10 @@ import type {
   DraftExpense,
   DraftOpening,
   DraftPayment,
+  DraftPurchase,
   DraftSale,
   DraftStockAdjustment,
+  DraftSupplierPayment,
   Item,
   Txn,
   TxnLine,
@@ -79,6 +81,8 @@ export const TxnSchema = z.object({
     "opening_balance",
     "stock_adjustment",
     "void",
+    "purchase",
+    "supplier_payment",
   ]),
   occurredAt: IsoTimeSchema,
   source: TxnSourceSchema,
@@ -195,3 +199,38 @@ export const DraftStockAdjustmentSchema = z.object({
   quantity: QuantitySchema.refine((q) => q > 0, positive),
   source: TxnSourceSchema,
 }) satisfies z.ZodType<DraftStockAdjustment>;
+
+export const DraftPurchaseLineSchema = z.object({
+  itemId: IdSchema,
+  quantity: QuantitySchema.refine((q) => q > 0, positive),
+  unit: z.string().min(1),
+  unitPrice: MoneySchema,
+});
+
+export const DraftPurchaseSchema = z
+  .object({
+    lines: z.array(DraftPurchaseLineSchema).min(1),
+    totalAmount: MoneySchema,
+    amountPaid: MoneySchema,
+    paymentMethod: PaymentMethodSchema.nullable(),
+    supplierId: IdSchema.optional(),
+    newSupplier: NewPartySchema.optional(),
+    dueDate: DaySchema.optional(),
+    dueDateNote: z.string().optional(),
+    description: z.string().optional(),
+  })
+  .refine((d) => !(d.supplierId && d.newSupplier), {
+    message: "Name an existing supplier or a new one, not both",
+    path: ["newSupplier"],
+  })
+  .refine((d) => d.amountPaid <= d.totalAmount, {
+    message: "Amount paid cannot exceed total amount",
+    path: ["amountPaid"],
+  }) satisfies z.ZodType<DraftPurchase>;
+
+export const DraftSupplierPaymentSchema = z.object({
+  supplierId: IdSchema,
+  amount: MoneySchema.refine((a) => a > 0, positive),
+  paymentMethod: PaymentMethodSchema,
+  externalReference: z.string().optional(),
+}) satisfies z.ZodType<DraftSupplierPayment>;

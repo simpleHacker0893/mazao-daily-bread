@@ -14,6 +14,23 @@ export type DaySummary = {
   otherIn: Cents;
 };
 
+export type MoneyFlow = {
+  cashIn: Cents;
+  mpesaIn: Cents;
+  otherIn: Cents;
+  cashOut: Cents;
+  mpesaOut: Cents;
+  otherOut: Cents;
+};
+
+export type RangeSummary = {
+  sales: Cents;
+  cogs: Cents;
+  expenses: Cents;
+  faidaHalisi: Cents;
+  moneyFlow: MoneyFlow;
+};
+
 /**
  * One day's numbers. Brought-forward records (opening balances, opening stock) are never sales
  * or expenses; money in is what was actually paid, by method.
@@ -56,5 +73,50 @@ export function daySummary(
     cashIn: moneyIn.cash,
     mpesaIn: moneyIn.mpesa,
     otherIn: moneyIn.other,
+  };
+}
+
+/**
+ * A date range's numbers. Purchase and supplier_payment affect money out only;
+ * Sales, COGS, Expenses, Faida Halisi formulas UNCHANGED (D-014).
+ * Purchase never touches them.
+ */
+export function rangeSummary(
+  txns: readonly Txn[],
+  lines: readonly TxnLine[],
+  range: DayRange,
+): RangeSummary {
+  const day = daySummary(txns, lines, range);
+
+  const active = activeTxns(txns).filter((t) => isInRange(t.occurredAt, range));
+  const moneyOut: { cash: Cents; mpesa: Cents; other: Cents } = {
+    cash: 0,
+    mpesa: 0,
+    other: 0,
+  };
+
+  for (const t of active) {
+    if (t.type === "purchase" && t.paymentMethod && t.amountPaid > 0) {
+      moneyOut[t.paymentMethod] += t.amountPaid;
+    } else if (t.type === "supplier_payment" && t.paymentMethod) {
+      moneyOut[t.paymentMethod] += t.totalAmount;
+    } else if (t.type === "expense" && t.paymentMethod) {
+      moneyOut[t.paymentMethod] += t.totalAmount;
+    }
+  }
+
+  return {
+    sales: day.sales,
+    cogs: day.cogs,
+    expenses: day.expenses,
+    faidaHalisi: day.faidaHalisi,
+    moneyFlow: {
+      cashIn: day.cashIn,
+      mpesaIn: day.mpesaIn,
+      otherIn: day.otherIn,
+      cashOut: moneyOut.cash,
+      mpesaOut: moneyOut.mpesa,
+      otherOut: moneyOut.other,
+    },
   };
 }

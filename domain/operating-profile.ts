@@ -15,6 +15,9 @@ export const OperatingProfileSchema = z.object({
   defaultDueRule: z
     .enum(["kesho", "ijumaa", "wiki_ijayo", "mwisho_wa_mwezi"])
     .nullable(),
+  supplierDefaultDueRule: z
+    .enum(["kesho", "ijumaa", "wiki_ijayo", "mwisho_wa_mwezi"])
+    .nullable(),
   expenseCategories: z.array(z.string().min(1)),
   rules: z.object({
     negativeStock: RuleLevel,
@@ -24,6 +27,10 @@ export const OperatingProfileSchema = z.object({
       thresholdPct: z.number().positive(),
     }),
     duplicate: RuleLevel,
+    buyingPriceChange: z.object({
+      mode: RuleLevel,
+      thresholdPct: z.number().positive(),
+    }),
   }),
 });
 
@@ -55,12 +62,14 @@ export function defaultProfile(): OperatingProfile {
     paymentMethods: ["cash", "mpesa", "other"],
     deniEnabled: true,
     defaultDueRule: null,
+    supplierDefaultDueRule: null,
     expenseCategories: [...DEFAULT_EXPENSE_CATEGORIES],
     rules: {
       negativeStock: "warn",
       belowCost: "warn",
       priceVariance: { mode: "warn", thresholdPct: 30 },
       duplicate: "warn",
+      buyingPriceChange: { mode: "warn", thresholdPct: 30 },
     },
   };
 }

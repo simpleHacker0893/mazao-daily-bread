@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { nairobiDayRange } from "./dates";
 import { type GrillContext, type GrillInput, runGrill } from "./grill";
 import { defaultProfile, type OperatingProfile } from "./operating-profile";
 import { at, item, line, txn } from "./test-fixtures";
-import type { DraftSale } from "./types";
+import type { DraftPurchase, DraftSale, DraftSupplierPayment } from "./types";
 
 const sukuma = item({
   name: "Sukuma wiki",
@@ -44,6 +45,41 @@ function sale(fields: Partial<DraftSale> = {}): GrillInput {
       ],
       totalAmount: 15000,
       amountPaid: 15000,
+      paymentMethod: "cash",
+      ...fields,
+    },
+  };
+}
+
+function purchase(fields: Partial<DraftPurchase> = {}): GrillInput {
+  return {
+    type: "purchase",
+    draft: {
+      lines: [
+        {
+          itemId: sukuma.id,
+          quantity: 2,
+          unit: "kilo",
+          unitPrice: 3000,
+        },
+      ],
+      totalAmount: 6000,
+      amountPaid: 6000,
+      paymentMethod: "cash",
+      supplierId: "kamau",
+      ...fields,
+    },
+  };
+}
+
+function supplierPayment(
+  fields: Partial<DraftSupplierPayment> = {},
+): GrillInput {
+  return {
+    type: "supplier_payment",
+    draft: {
+      supplierId: "kamau",
+      amount: 1000,
       paymentMethod: "cash",
       ...fields,
     },
@@ -344,5 +380,507 @@ describe("rule-to-type matrix (M7)", () => {
     expect(
       codes(runGrill({ type: "void", draft: { txnId: "" } }, ctx()).hardErrors),
     ).toEqual(["SCHEMA"]);
+  });
+});
+
+describe("purchase grill rules", () => {
+  it("DENI_NEEDS_SUPPLIER is a hard error for a deni purchase with no supplier", () => {
+    const result = runGrill(
+      purchase({
+        amountPaid: 2000,
+        supplierId: undefined,
+        newSupplier: undefined,
+      }),
+      ctx(stocked()),
+    );
+    expect(codes(result.hardErrors)).toEqual(["DENI_NEEDS_SUPPLIER"]);
+    expect(result.hardErrors[0]?.severity).toBe("block");
+  });
+
+  it("DENI_NEEDS_SUPPLIER throws even with override: true (handled in commit, not grill)", () => {
+    const result = runGrill(
+      purchase({
+        amountPaid: 2000,
+        supplierId: undefined,
+        newSupplier: undefined,
+      }),
+      ctx(stocked()),
+    );
+    // Grill returns the hard error; commit layer decides whether to throw on override
+    expect(
+      result.hardErrors.some((e) => e.code === "DENI_NEEDS_SUPPLIER"),
+    ).toBe(true);
+  });
+
+  it("a deni purchase with an existing supplier has no DENI_NEEDS_SUPPLIER error", () => {
+    const result = runGrill(purchase({ amountPaid: 2000 }), ctx(stocked()));
+    expect(codes(result.hardErrors)).not.toContain("DENI_NEEDS_SUPPLIER");
+  });
+
+  it("a deni purchase with a new supplier has no DENI_NEEDS_SUPPLIER error", () => {
+    const result = runGrill(
+      purchase({
+        amountPaid: 2000,
+        supplierId: undefined,
+        newSupplier: { name: "New Supplier" },
+      }),
+      ctx(stocked()),
+    );
+    expect(codes(result.hardErrors)).not.toContain("DENI_NEEDS_SUPPLIER");
+  });
+
+  it("a fully paid purchase (amountPaid === totalAmount) needs no supplier", () => {
+    const result = runGrill(
+      purchase({
+        amountPaid: 6000,
+        supplierId: undefined,
+        newSupplier: undefined,
+      }),
+      ctx(stocked()),
+    );
+    expect(codes(result.hardErrors)).not.toContain("DENI_NEEDS_SUPPLIER");
+  });
+
+  it("ARITHMETIC fires when purchase lines don't add up", () => {
+    const result = runGrill(
+      purchase({ totalAmount: 5000, amountPaid: 5000 }),
+      ctx(stocked()),
+    );
+    expect(codes(result.hardErrors)).toContain("ARITHMETIC");
+  });
+
+  it("PAID_EXCEEDS_TOTAL fires when purchase amountPaid > totalAmount", () => {
+    const result = runGrill(
+      purchase({ totalAmount: 5000, amountPaid: 6000 }),
+      ctx(stocked()),
+    );
+    expect(codes(result.hardErrors)).toContain("PAID_EXCEEDS_TOTAL");
+  });
+
+  it("BUYING_PRICE_CHANGED fires when line price differs from item.buyingPrice by > threshold", () => {
+    // sukuma.buyingPrice = 3000, line = 3900 (30% increase)
+    const result = runGrill(
+      purchase({
+        lines: [
+          { itemId: sukuma.id, quantity: 1, unit: "kilo", unitPrice: 3900 },
+        ],
+        totalAmount: 3900,
+        amountPaid: 3900,
+        paymentMethod: "cash",
+        supplierId: "kamau",
+      }),
+      ctx(stocked()),
+    );
+    expect(codes(result.issues)).toContain("BUYING_PRICE_CHANGED");
+  });
+
+  it("BUYING_PRICE_CHANGED does not fire when variance is at or below threshold (30%)", () => {
+    // sukuma.buyingPrice = 3000, line = 3900 is exactly 30%, should NOT fire (threshold is > 30%)
+    const result = runGrill(
+      purchase({
+        lines: [
+          { itemId: sukuma.id, quantity: 1, unit: "kilo", unitPrice: 3900 },
+        ],
+        totalAmount: 3900,
+        amountPaid: 3900,
+        paymentMethod: "cash",
+        supplierId: "kamau",
+      }),
+      ctx(stocked()),
+    );
+    expect(codes(result.issues)).not.toContain("BUYING_PRICE_CHANGED");
+  });
+
+  it("BUYING_PRICE_CHANGED fires at warn by default", () => {
+    const result = runGrill(
+      purchase({
+        lines: [
+          { itemId: sukuma.id, quantity: 1, unit: "kilo", unitPrice: 4000 },
+        ],
+        totalAmount: 4000,
+        amountPaid: 4000,
+        paymentMethod: "cash",
+        supplierId: "kamau",
+      }),
+      ctx(stocked()),
+    );
+    const issue = result.issues.find((i) => i.code === "BUYING_PRICE_CHANGED");
+    expect(issue?.severity).toBe("warn");
+  });
+
+  it("BUYING_PRICE_CHANGED fires at block when profile says block", () => {
+    const profile: OperatingProfile = {
+      ...defaultProfile(),
+      rules: {
+        ...defaultProfile().rules,
+        buyingPriceChange: { mode: "block", thresholdPct: 10 },
+      },
+    };
+    const result = runGrill(
+      purchase({
+        lines: [
+          { itemId: sukuma.id, quantity: 1, unit: "kilo", unitPrice: 3400 },
+        ],
+        totalAmount: 3400,
+        amountPaid: 3400,
+        paymentMethod: "cash",
+        supplierId: "kamau",
+      }),
+      ctx({ ...stocked(), profile }),
+    );
+    const issue = result.issues.find((i) => i.code === "BUYING_PRICE_CHANGED");
+    expect(issue?.severity).toBe("block");
+  });
+
+  it("BUYING_PRICE_CHANGED does not fire for items without buyingPrice", () => {
+    const noPriceItem = item({
+      name: "New Item",
+      buyingPrice: 0,
+      sellingPrice: 5000,
+    });
+    const result = runGrill(
+      purchase({
+        lines: [
+          {
+            itemId: noPriceItem.id,
+            quantity: 1,
+            unit: "kilo",
+            unitPrice: 10000,
+          },
+        ],
+        totalAmount: 10000,
+        amountPaid: 10000,
+        paymentMethod: "cash",
+        supplierId: "kamau",
+      }),
+      ctx({ ...ctx(), items: [noPriceItem] }),
+    );
+    expect(codes(result.issues)).not.toContain("BUYING_PRICE_CHANGED");
+  });
+});
+
+describe("supplier_payment grill rules", () => {
+  it("SUPPLIER_OVERPAID warns when payment exceeds current amount owed", () => {
+    // Owed 2000, paying 3000
+    const owed = txn({
+      type: "purchase",
+      supplierId: "kamau",
+      totalAmount: 3000,
+      amountPaid: 1000,
+      paymentMethod: "cash",
+    });
+    const result = runGrill(
+      supplierPayment({ amount: 3000 }),
+      ctx({ txns: [owed] }),
+    );
+    expect(codes(result.issues)).toContain("SUPPLIER_OVERPAID");
+  });
+
+  it("SUPPLIER_OVERPAID does not fire when payment equals or is less than owed", () => {
+    const owed = txn({
+      type: "purchase",
+      supplierId: "kamau",
+      totalAmount: 3000,
+      amountPaid: 1000,
+      paymentMethod: "cash",
+    });
+    const exact = runGrill(
+      supplierPayment({ amount: 2000 }),
+      ctx({ txns: [owed] }),
+    );
+    expect(codes(exact.issues)).not.toContain("SUPPLIER_OVERPAID");
+    const less = runGrill(
+      supplierPayment({ amount: 1000 }),
+      ctx({ txns: [owed] }),
+    );
+    expect(codes(less.issues)).not.toContain("SUPPLIER_OVERPAID");
+  });
+
+  it("SUPPLIER_OVERPAID is always warn severity", () => {
+    const owed = txn({
+      type: "purchase",
+      supplierId: "kamau",
+      totalAmount: 3000,
+      amountPaid: 1000,
+      paymentMethod: "cash",
+    });
+    const result = runGrill(
+      supplierPayment({ amount: 3000 }),
+      ctx({ txns: [owed] }),
+    );
+    const issue = result.issues.find((i) => i.code === "SUPPLIER_OVERPAID");
+    expect(issue?.severity).toBe("warn");
+  });
+});
+
+describe("POSSIBLE_DUPLICATE for purchases and supplier_payments", () => {
+  const earlierPurchase = txn({
+    type: "purchase",
+    supplierId: "kamau",
+    totalAmount: 6000,
+    amountPaid: 6000,
+    paymentMethod: "cash",
+    occurredAt: at(-5),
+  });
+  const earlierPayment = txn({
+    type: "supplier_payment",
+    supplierId: "kamau",
+    totalAmount: 1000,
+    amountPaid: 1000,
+    paymentMethod: "cash",
+    occurredAt: at(-5),
+  });
+
+  it("fires for purchase with same supplierId, type, total within 10 min", () => {
+    const result = runGrill(
+      purchase({ supplierId: "kamau" }),
+      ctx({ txns: [earlierPurchase] }),
+    );
+    expect(codes(result.issues)).toEqual(["POSSIBLE_DUPLICATE"]);
+  });
+
+  it("fires for supplier_payment with same supplierId, type, total within 10 min", () => {
+    const result = runGrill(supplierPayment(), ctx({ txns: [earlierPayment] }));
+    expect(codes(result.issues)).toEqual(["POSSIBLE_DUPLICATE"]);
+  });
+
+  it("never fires without a supplierId", () => {
+    const result = runGrill(
+      purchase({ supplierId: undefined, newSupplier: { name: "New" } }),
+      ctx({ txns: [earlierPurchase] }),
+    );
+    expect(codes(result.issues)).toEqual([]);
+  });
+
+  it("does not fire after 10 minutes", () => {
+    const result = runGrill(
+      purchase({ supplierId: "kamau" }),
+      ctx({ txns: [earlierPurchase], now: new Date(at(6)) }),
+    );
+    expect(codes(result.issues)).toEqual([]);
+  });
+
+  it("does not fire for different supplier", () => {
+    const other = txn({
+      type: "purchase",
+      supplierId: "njoroge",
+      totalAmount: 6000,
+      amountPaid: 6000,
+      paymentMethod: "cash",
+      occurredAt: at(-5),
+    });
+    const result = runGrill(
+      purchase({ supplierId: "kamau" }),
+      ctx({ txns: [other] }),
+    );
+    expect(codes(result.issues)).toEqual([]);
+  });
+
+  it("does not fire for different total amount", () => {
+    const other = txn({
+      type: "purchase",
+      supplierId: "kamau",
+      totalAmount: 5000,
+      amountPaid: 5000,
+      paymentMethod: "cash",
+      occurredAt: at(-5),
+    });
+    const result = runGrill(
+      purchase({ supplierId: "kamau" }),
+      ctx({ txns: [other] }),
+    );
+    expect(codes(result.issues)).toEqual([]);
+  });
+});
+
+describe("extended worked example (spec §Testing Decisions)", () => {
+  const viazi = item({
+    name: "Viazi",
+    unit: "gunia",
+    allowsFractional: false,
+    sellingPrice: 3000,
+    buyingPrice: 2500,
+  });
+
+  function workedExampleCtx() {
+    // R0 day: Sales 35000, COGS 9000, Expenses 5000, Faida 21000
+    const sukumaSale = txn({
+      type: "sale",
+      totalAmount: 15000,
+      amountPaid: 15000,
+      paymentMethod: "cash",
+      occurredAt: at(0),
+    });
+    const tripSale = txn({
+      type: "sale",
+      totalAmount: 20000,
+      amountPaid: 20000,
+      paymentMethod: "mpesa",
+      occurredAt: at(30),
+    });
+    const expense = txn({
+      type: "expense",
+      totalAmount: 5000,
+      amountPaid: 5000,
+      paymentMethod: "cash",
+      expenseCategory: "ushuru",
+      occurredAt: at(60),
+    });
+    const openingStock = txn({
+      type: "stock_adjustment",
+      source: "onboarding",
+    });
+    const lines = [
+      line({
+        txnId: sukumaSale.id,
+        itemId: sukuma.id,
+        itemKind: "goods",
+        quantity: 3,
+        unitPrice: 5000,
+        unitCost: 3000,
+      }),
+      line({
+        txnId: tripSale.id,
+        itemId: mayai.id,
+        itemKind: "service",
+        quantity: 1,
+        unitPrice: 20000,
+        unitCost: 0,
+      }),
+      line({ txnId: openingStock.id, itemId: viazi.id, quantity: 0 }),
+    ];
+    // Purchase: 2 gunia viazi @ 2800 = 5600, paid 3000 cash, supplier "Mzee Kariuki"
+    const mzeeKariuki = "mzee-kariuki";
+    const purchase = txn({
+      type: "purchase",
+      supplierId: mzeeKariuki,
+      totalAmount: 5600,
+      amountPaid: 3000,
+      paymentMethod: "cash",
+      occurredAt: at(90),
+    });
+    const purchaseLines = [
+      line({
+        txnId: purchase.id,
+        itemId: viazi.id,
+        itemKind: "goods",
+        quantity: 2,
+        unitPrice: 2800,
+        unitCost: 2800,
+      }),
+    ];
+    return {
+      txns: [sukumaSale, tripSale, expense, openingStock, purchase],
+      lines: [...lines, ...purchaseLines],
+      mzeeKariuki,
+    };
+  }
+
+  it("R0 day + purchase 2 gunia @ 2800 paid 3000 cash → Sales 35000, COGS 9000, Expenses 5000, Faida 21000", () => {
+    const { txns, lines } = workedExampleCtx();
+    const today = nairobiDayRange("2026-10-26");
+    const { rangeSummary } = require("./summary");
+    const result = rangeSummary(txns, lines, today);
+    expect(result.sales).toBe(35000);
+    expect(result.cogs).toBe(9000);
+    expect(result.expenses).toBe(5000);
+    expect(result.faidaHalisi).toBe(21000);
+  });
+
+  it("cashOut = 3000 (purchase) + 5000 (expense) = 8000", () => {
+    const { txns, lines } = workedExampleCtx();
+    const today = nairobiDayRange("2026-10-26");
+    const { rangeSummary } = require("./summary");
+    const result = rangeSummary(txns, lines, today);
+    expect(result.moneyFlow.cashOut).toBe(8000);
+  });
+
+  it("supplier owed = 2600 (5600 - 3000)", () => {
+    const { txns, mzeeKariuki } = workedExampleCtx();
+    const { supplierOwed } = require("./ledger");
+    expect(supplierOwed(mzeeKariuki, txns)).toBe(2600);
+  });
+});
+
+describe("D-015 interaction: purchase at new buying price changes unitCost on next sale, not past sales", () => {
+  const sukumaItem = item({
+    name: "Sukuma wiki",
+    sellingPrice: 5000,
+    buyingPrice: 3000,
+  });
+
+  it("past sales keep old unitCost", () => {
+    // Day 1: purchase at 3000
+    const purchase1 = txn({
+      type: "purchase",
+      supplierId: "s1",
+      totalAmount: 3000,
+      amountPaid: 3000,
+      paymentMethod: "cash",
+    });
+    const purchase1Line = line({
+      txnId: purchase1.id,
+      itemId: sukumaItem.id,
+      itemKind: "goods",
+      quantity: 1,
+      unitPrice: 3000,
+      unitCost: 3000,
+    });
+    // Day 1: sale at 5000
+    const sale1 = txn({
+      type: "sale",
+      totalAmount: 5000,
+      amountPaid: 5000,
+      paymentMethod: "cash",
+    });
+    const sale1Line = line({
+      txnId: sale1.id,
+      itemId: sukumaItem.id,
+      itemKind: "goods",
+      quantity: 1,
+      unitPrice: 5000,
+      unitCost: 3000,
+    });
+    // Day 2: purchase at 3500
+    const purchase2 = txn({
+      type: "purchase",
+      supplierId: "s2",
+      totalAmount: 3500,
+      amountPaid: 3500,
+      paymentMethod: "cash",
+      occurredAt: at(1440),
+    });
+    const purchase2Line = line({
+      txnId: purchase2.id,
+      itemId: sukumaItem.id,
+      itemKind: "goods",
+      quantity: 1,
+      unitPrice: 3500,
+      unitCost: 3500,
+    });
+    // Day 2: sale at 5000
+    const sale2 = txn({
+      type: "sale",
+      totalAmount: 5000,
+      amountPaid: 5000,
+      paymentMethod: "cash",
+      occurredAt: at(1450),
+    });
+    const sale2Line = line({
+      txnId: sale2.id,
+      itemId: sukumaItem.id,
+      itemKind: "goods",
+      quantity: 1,
+      unitPrice: 5000,
+      unitCost: 3500,
+    });
+
+    const { rangeSummary } = require("./summary");
+    const today = nairobiDayRange("2026-10-26");
+    const allTxns = [purchase1, sale1, purchase2, sale2];
+    const allLines = [purchase1Line, sale1Line, purchase2Line, sale2Line];
+    const result = rangeSummary(allTxns, allLines, today);
+    // COGS = 3000 (first sale) + 3500 (second sale) = 6500
+    expect(result.cogs).toBe(6500);
   });
 });

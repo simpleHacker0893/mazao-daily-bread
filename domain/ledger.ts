@@ -78,12 +78,77 @@ export function isOverdue(
 
 /** What the merchant owes a supplier. R0 has only brought-forward supplier deni. */
 export function supplierOwed(supplierId: Id, txns: readonly Txn[]): Cents {
-  return activeTxns(txns)
-    .filter((t) => t.type === "opening_balance" && t.supplierId === supplierId)
-    .reduce((sum, t) => sum + t.totalAmount, 0);
+  let balance = 0;
+  for (const t of activeTxns(txns)) {
+    if (t.supplierId !== supplierId) continue;
+    balance += supplierCreditAmount(t) - supplierPaymentAmount(t);
+  }
+  return balance;
 }
 
-/** Goods on hand: stock adjustments minus goods sold, to 3 decimals. */
+/**
+ * The supplier's unpaid credits (what the merchant owes), oldest first.
+ * Payments settle the oldest credit first (FIFO); an overpayment carries forward
+ * and settles later credits.
+ */
+export function openSupplierDeni(
+  supplierId: Id,
+  txns: readonly Txn[],
+): OpenDeni[] {
+  const mine = activeTxns(txns).filter((t) => t.supplierId === supplierId);
+  let paid = mine.reduce((sum, t) => sum + supplierPaymentAmount(t), 0);
+  const open: OpenDeni[] = [];
+  const credits = mine
+    .filter((t) => supplierCreditAmount(t) > 0)
+    .sort(oldestFirst);
+  for (const credit of credits) {
+    const owed = supplierCreditAmount(credit);
+    const settled = Math.min(paid, owed);
+    paid -= settled;
+    if (owed > settled) {
+      open.push({
+        txnId: credit.id,
+        remaining: owed - settled,
+        dueDate: credit.dueDate,
+        occurredAt: credit.occurredAt,
+      });
+    }
+  }
+  return open;
+}
+
+/** True when any open supplier deni is past its due date. */
+export function isSupplierOverdue(
+  supplierId: Id,
+  txns: readonly Txn[],
+  today: Day,
+): boolean {
+  return openSupplierDeni(supplierId, txns).some(
+    (d) => d.dueDate !== undefined && d.dueDate < today,
+  );
+}
+
+/** Suppliers with deni due within `days` days (including today). */
+export function supplierDueWithin(
+  txns: readonly Txn[],
+  today: Day,
+  days: number,
+): Id[] {
+  const cutoff = addDays(today, days);
+  const suppliersWithBalance = new Set<string>();
+  for (const t of activeTxns(txns)) {
+    if (!t.supplierId) continue;
+    const owed = supplierOwed(t.supplierId, txns);
+    if (owed <= 0) continue;
+    const open = openSupplierDeni(t.supplierId, txns);
+    if (open.some((d) => d.dueDate !== undefined && d.dueDate <= cutoff)) {
+      suppliersWithBalance.add(t.supplierId);
+    }
+  }
+  return Array.from(suppliersWithBalance);
+}
+
+/** Goods on hand: stock adjustments + purchase goods lines − sale goods lines, to 3 decimals. */
 export function stockOnHand(
   itemId: Id,
   txns: readonly Txn[],
@@ -97,6 +162,7 @@ export function stockOnHand(
     const qty = Math.round(l.quantity * 1000);
     if (type === "stock_adjustment") thousandths += qty;
     else if (type === "sale") thousandths -= qty;
+    else if (type === "purchase") thousandths += qty;
   }
   return thousandths / 1000;
 }
@@ -111,6 +177,16 @@ function paymentAmount(t: Txn): Cents {
   return t.type === "customer_payment" ? t.totalAmount : 0;
 }
 
+function supplierCreditAmount(t: Txn): Cents {
+  if (t.type === "purchase") return t.totalAmount - t.amountPaid;
+  if (t.type === "opening_balance" && t.supplierId) return t.totalAmount;
+  return 0;
+}
+
+function supplierPaymentAmount(t: Txn): Cents {
+  return t.type === "supplier_payment" ? t.totalAmount : 0;
+}
+
 function oldestFirst(a: Txn, b: Txn): number {
   return (
     a.occurredAt.localeCompare(b.occurredAt) ||
@@ -121,4 +197,13 @@ function oldestFirst(a: Txn, b: Txn): number {
 
 function newestFirst(a: Txn, b: Txn): number {
   return oldestFirst(b, a);
+}
+
+function addDays(day: Day, n: number): Day {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const EAT_OFFSET_MS = 3 * 60 * 60 * 1000;
+  const dayStart = Date.parse(`${day}T00:00:00.000Z`) - EAT_OFFSET_MS;
+  return new Date(dayStart + n * DAY_MS + EAT_OFFSET_MS)
+    .toISOString()
+    .slice(0, 10);
 }

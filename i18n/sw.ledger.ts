@@ -9,9 +9,14 @@ export const ledger: Record<keyof typeof en, string> = {
   "ledger.grill.arithmetic": "The lines don't add up to the total.",
   "ledger.grill.paidExceedsTotal": "Paid is more than the total.",
   "ledger.grill.deniNeedsCustomer": "Choose who owes this.",
+  "ledger.grill.deniNeedsSupplier": "Choose which supplier this is for.",
   "ledger.grill.negativeStock": "This sells more than you have in stock.",
   "ledger.grill.belowCost": "This price is below what you paid for it.",
   "ledger.grill.priceVariance": "This price is far from the usual price.",
+  "ledger.grill.buyingPriceChanged":
+    "Buying price has changed from the last purchase.",
   "ledger.grill.possibleDuplicate":
     "This looks the same as one you saved a few minutes ago.",
+  "ledger.grill.supplierOverpaid":
+    "Payment exceeds what you currently owe this supplier.",
 };
