@@ -62,7 +62,14 @@ export function isPendingSignInValid(
   },
 ): boolean {
   if (!pending) return false;
-  if (ctx.now - pending.createdAt > PENDING_SIGN_IN_TTL_MS) return false;
+  if (
+    !Number.isSafeInteger(pending.createdAt) ||
+    pending.createdAt < 0 ||
+    pending.createdAt > ctx.now ||
+    ctx.now - pending.createdAt > PENDING_SIGN_IN_TTL_MS
+  ) {
+    return false;
+  }
   if (!ctx.clerkUserId || pending.clerkUserId !== ctx.clerkUserId) return false;
   if (ctx.existing) {
     return (

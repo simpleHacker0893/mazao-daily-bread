@@ -32,6 +32,7 @@ export type IssueCode =
   | "ARITHMETIC"
   | "PAID_EXCEEDS_TOTAL"
   | "DENI_NEEDS_CUSTOMER"
+  | "NON_FRACTIONAL_QUANTITY"
   | "NEGATIVE_STOCK"
   | "BELOW_COST"
   | "PRICE_VARIANCE"
@@ -72,6 +73,7 @@ const messageKeys: Record<IssueCode, MessageKey> = {
   ARITHMETIC: "ledger.grill.arithmetic",
   PAID_EXCEEDS_TOTAL: "ledger.grill.paidExceedsTotal",
   DENI_NEEDS_CUSTOMER: "ledger.grill.deniNeedsCustomer",
+  NON_FRACTIONAL_QUANTITY: "ledger.grill.nonFractionalQuantity",
   NEGATIVE_STOCK: "ledger.grill.negativeStock",
   BELOW_COST: "ledger.grill.belowCost",
   PRICE_VARIANCE: "ledger.grill.priceVariance",
@@ -166,6 +168,10 @@ function grillSale(draft: DraftSale, ctx: GrillContext): GrillResult {
   draft.lines.forEach((l, index) => {
     const item = l.itemId ? items.get(l.itemId) : undefined;
     if (!item) return;
+
+    if (!item.allowsFractional && !Number.isInteger(l.quantity)) {
+      hardErrors.push(issue("NON_FRACTIONAL_QUANTITY", "block", index));
+    }
 
     if (l.itemKind === "goods") {
       const taken =

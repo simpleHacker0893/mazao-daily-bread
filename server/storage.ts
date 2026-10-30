@@ -6,4 +6,9 @@ import { neon } from "files-sdk/neon";
 
 export const ASSETS_BUCKET = "assets";
 
-export const files = new Files({ adapter: neon({ bucket: ASSETS_BUCKET }) });
+let storage: Files | undefined;
+
+export function getFiles(): Files {
+  storage ??= new Files({ adapter: neon({ bucket: ASSETS_BUCKET }) });
+  return storage;
+}

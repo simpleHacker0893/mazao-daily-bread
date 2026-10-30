@@ -117,6 +117,46 @@ describe("hard errors (cannot be overridden)", () => {
       issues: [],
     });
   });
+
+  it("rejects fractional sale quantities for items that require whole units", () => {
+    const result = runGrill(
+      sale({
+        lines: [
+          {
+            itemId: mayai.id,
+            itemKind: "goods",
+            description: "Mayai",
+            quantity: 1.5,
+            unit: "tray",
+            unitPrice: 45000,
+          },
+        ],
+        totalAmount: 67500,
+        amountPaid: 67500,
+      }),
+      ctx(),
+    );
+    expect(result.hardErrors).toEqual([
+      {
+        code: "NON_FRACTIONAL_QUANTITY",
+        severity: "block",
+        messageKey: "ledger.grill.nonFractionalQuantity",
+        lineIndex: 0,
+      },
+    ]);
+  });
+
+  it("allows up to three decimal places for items that permit fractions", () => {
+    const result = runGrill(
+      sale({
+        lines: [sukumaLine(0.333, 100)],
+        totalAmount: 33,
+        amountPaid: 33,
+      }),
+      ctx(),
+    );
+    expect(result.hardErrors).toEqual([]);
+  });
 });
 
 describe("NEGATIVE_STOCK", () => {

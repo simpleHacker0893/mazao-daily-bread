@@ -36,6 +36,33 @@ export function todayInNairobi(now: Date): Day {
   return toDay(now.getTime());
 }
 
+/** The EAT calendar day that an instant falls in. */
+export function nairobiDayOf(at: IsoTime): Day {
+  return toDay(Date.parse(at));
+}
+
+/** "14:05" in Nairobi time (24-hour). */
+export function formatNairobiTime(at: IsoTime): string {
+  return new Date(Date.parse(at) + EAT_OFFSET_MS).toISOString().slice(11, 16);
+}
+
+/**
+ * "Mon 26 Oct 2026" in English; Kiswahili day and month names come from the platform's
+ * `sw-KE` locale data. A day is a plain calendar date, so the formatter runs in UTC.
+ */
+export function formatNairobiDate(day: Day, locale: "en" | "sw"): string {
+  const parts = new Intl.DateTimeFormat(locale === "sw" ? "sw-KE" : "en-US", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).formatToParts(new Date(`${day}T00:00:00.000Z`));
+  const pick = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${pick("weekday")} ${pick("day")} ${pick("month")} ${pick("year")}`;
+}
+
 function addDays(day: Day, n: number): Day {
   return toDay(dayStartUtcMs(day) + n * DAY_MS);
 }

@@ -25,3 +25,29 @@ export function formatKES(cents: Cents): string {
 export function lineTotal(quantity: number, unitPrice: Cents): Cents {
   return Math.round(quantity * unitPrice);
 }
+
+/** Sum line values after each line is rounded, matching the ledger's sale arithmetic. */
+export function linesTotal(
+  lines: readonly { quantity: number; unitPrice: Cents }[],
+): Cents {
+  return lines.reduce(
+    (total, line) => total + lineTotal(line.quantity, line.unitPrice),
+    0,
+  );
+}
+
+/** Totals for an in-progress sale; line rounding is shared with the ledger commit. */
+export function saleDraftTotals(
+  lines: readonly { quantity: number; unitPrice: Cents }[],
+  amountPaid: Cents,
+): { lineTotals: Cents[]; total: Cents; deni: Cents } {
+  const lineTotals = lines.map((line) =>
+    lineTotal(line.quantity, line.unitPrice),
+  );
+  const total = lineTotals.reduce((sum, lineAmount) => sum + lineAmount, 0);
+  return {
+    lineTotals,
+    total,
+    deni: Math.max(0, total - amountPaid),
+  };
+}

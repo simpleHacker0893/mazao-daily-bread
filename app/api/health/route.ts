@@ -1,7 +1,7 @@
 // Liveness of the server-side services. /api/* is never cached by the service worker.
 // Reports only ok/error per service; never echoes connection details or record contents.
 import { db } from "@/server/db";
-import { files } from "@/server/storage";
+import { getFiles } from "@/server/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +14,7 @@ async function checkDatabase(): Promise<boolean> {
 }
 
 async function checkStorage(): Promise<boolean> {
+  const files = getFiles();
   // Production: read-only probe, so this public endpoint can't be used to write to the bucket.
   if (process.env.NODE_ENV === "production") {
     await files.list({ prefix: "health/" });

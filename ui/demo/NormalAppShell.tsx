@@ -3,6 +3,7 @@
 import { UserButton } from "@clerk/nextjs";
 import type { ReactNode } from "react";
 import { ClerkRoot } from "@/auth/clerk";
+import { LockGuard } from "@/ui/auth/LockGuard";
 import { BottomNav } from "@/ui/shell/BottomNav";
 import { SyncChip } from "@/ui/shell/SyncChip";
 
@@ -18,7 +19,7 @@ export function NormalAppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <main className="flex-1 pb-[calc(4rem+env(safe-area-inset-bottom))]">
-          {children}
+          <LockGuard>{children}</LockGuard>
         </main>
         <BottomNav />
       </div>

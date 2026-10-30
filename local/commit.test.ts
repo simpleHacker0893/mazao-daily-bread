@@ -175,6 +175,53 @@ describe("commitSale", () => {
     const saved = await commitSale(ctx, sukumaSale(item.id, 3));
     expect(saved.overrides).toEqual([]);
   });
+
+  it("rejects fractional quantities for whole-unit items even when called directly", async () => {
+    const item = await addItem(ctx, {
+      kind: "goods",
+      name: "Mayai",
+      unit: "tray",
+      allowsFractional: false,
+      sellingPrice: 45000,
+      buyingPrice: 40000,
+      lowStockThreshold: null,
+    });
+    const beforeQueueCount = await db.syncQueue.count();
+
+    await expect(
+      commitSale(ctx, {
+        lines: [
+          {
+            itemId: item.id,
+            itemKind: "goods",
+            description: "Mayai",
+            quantity: 1.5,
+            unit: "tray",
+            unitPrice: 45000,
+          },
+        ],
+        totalAmount: 67500,
+        amountPaid: 67500,
+        paymentMethod: "cash",
+      }),
+    ).rejects.toMatchObject({ codes: ["NON_FRACTIONAL_QUANTITY"] });
+
+    expect(await db.txns.where("type").equals("sale").count()).toBe(0);
+    expect(await db.lines.count()).toBe(0);
+    expect(await db.syncQueue.count()).toBe(beforeQueueCount);
+  });
+
+  it("saves fractional quantities through commit for fractional items", async () => {
+    const item = await sukuma();
+    const saved = await commitSale(ctx, {
+      ...sukumaSale(item.id, 0.333),
+      totalAmount: 1665,
+      amountPaid: 1665,
+    });
+    expect(
+      await db.lines.where("txnId").equals(saved.id).first(),
+    ).toMatchObject({ quantity: 0.333 });
+  });
 });
 
 describe("opening balances and stock (M6, M7)", () => {
